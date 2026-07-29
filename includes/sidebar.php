@@ -71,7 +71,7 @@
     <nav class="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-3 space-y-1">
 
         <!-- DASHBOARD -->
-        <a href="/epayroll/admin/admin-dashboard"
+        <a href="/epayroll/includes/dashboard"
             class="sidebar-nav-link flex items-center gap-3 px-3 py-3 text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-700 transition-colors group">
             <i class="fa-solid fa-display text-gray-500 group-hover:text-green-600 text-lg shrink-0 w-5 text-center"></i>
             <span class="sidebar-text whitespace-nowrap font-medium">Dashboard</span>
@@ -116,7 +116,7 @@
                 <i class="dropdown-chevron fa-solid fa-chevron-down text-gray-400 ml-auto text-sm shrink-0 transition-transform duration-300"></i>
             </button>
             <div class="dropdown-menu max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out">
-                <a href="#" class="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Payroll Transaction</a>
+                <a href="/epayroll/employee/employee-payroll" class="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Payroll Transaction</a>
                 <a href="#" class="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">First / Last Cut-Off</a>
             </div>
         </div>
@@ -171,7 +171,7 @@
 
     <!-- FOOTER -->
     <div class="p-3 border-t border-gray-200 bg-gray-50 shrink-0">
-        <a href="#" class="flex items-center gap-3 px-3 py-2.5 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors mb-1">
+        <a href="/ePayroll/includes/settings.php" class="flex items-center gap-3 px-3 py-2.5 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors mb-1">
             <i class="fa-solid fa-gear text-gray-500 text-lg shrink-0 w-5 text-center"></i>
             <span class="sidebar-text whitespace-nowrap font-medium text-sm">Settings</span>
         </a>
