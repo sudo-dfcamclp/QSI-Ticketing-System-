@@ -71,7 +71,7 @@
     <nav class="flex-1 overflow-y-auto overflow-x-hidden px-3 pb-3 space-y-1">
 
         <!-- DASHBOARD -->
-        <a href="/ePayroll/"
+        <a href="/epayroll/admin/admin-dashboard"
             class="sidebar-nav-link flex items-center gap-3 px-3 py-3 text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-700 transition-colors group">
             <i class="fa-solid fa-display text-gray-500 group-hover:text-green-600 text-lg shrink-0 w-5 text-center"></i>
             <span class="sidebar-text whitespace-nowrap font-medium">Dashboard</span>
@@ -88,7 +88,7 @@
                 <i class="dropdown-chevron fa-solid fa-chevron-down text-gray-400 ml-auto text-sm shrink-0 transition-transform duration-300"></i>
             </button>
             <div class="dropdown-menu max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-in-out">
-                <a href="#" class="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Employee Info</a>
+                <a href="/epayroll/employee/employee-info" class="block px-3 py-2 text-sm text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-md">Employee Info</a>
             </div>
         </div>
 
