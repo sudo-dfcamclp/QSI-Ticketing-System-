@@ -415,105 +415,239 @@
             </div>
         </div>
 
-            <!-- 4. BIG MODERN BOX (Recent Updates) -->
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800"><i class="fa-solid fa-clock-rotate-left text-orange-500 mr-2"></i>Recent Employee Updates</h3>
-                    <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">View All</button>
-                </div>
-                <div class="space-y-4">
-                    <div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
-                        <div class="bg-green-100 text-green-600 p-2 rounded-lg"><i class="fa-solid fa-user-plus"></i></div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-800">New employee onboarded - Maria Santos</p>
-                            <p class="text-xs text-gray-500">2 hours ago</p>
-                        </div>
-                        <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">New</span>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
-                        <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-arrow-up"></i></div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-800">Promotion - Juan Dela Cruz to Senior Developer</p>
-                            <p class="text-xs text-gray-500">5 hours ago</p>
-                        </div>
-                        <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">Promotion</span>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition">
-                        <div class="bg-orange-100 text-orange-600 p-2 rounded-lg"><i class="fa-solid fa-file-pen"></i></div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-800">Record update - Contact info for EMP-005</p>
-                            <p class="text-xs text-gray-500">Yesterday</p>
-                        </div>
-                        <span class="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">Update</span>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 5. BIG MODERN BOX (Upcoming Schedule) -->
-            <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800"><i class="fa-solid fa-calendar-check text-green-600 mr-2"></i>Upcoming Schedule</h3>
-                    <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">Calendar</button>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                        <div class="bg-green-100 text-green-600 px-3 py-2 rounded-lg text-center min-w-[60px]">
-                            <p class="text-lg font-bold leading-none">15</p>
-                            <p class="text-xs">AUG</p>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-800">Team Building - Engineering Dept</p>
-                            <p class="text-xs text-gray-500">All day event</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                        <div class="bg-blue-100 text-blue-600 px-3 py-2 rounded-lg text-center min-w-[60px]">
-                            <p class="text-lg font-bold leading-none">20</p>
-                            <p class="text-xs">AUG</p>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-gray-800">Payroll Cut-off Period</p>
-                            <p class="text-xs text-gray-500">Deadline: 5:00 PM</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- 6. BIG MODERN BOX (Documents & Compliance) -->
+            <!-- 4. BIG MODERN BOX (Employment Information) -->
             <div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 p-6 mb-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-800"><i class="fa-solid fa-file-invoice text-purple-600 mr-2"></i>Documents & Compliance</h3>
-                    <button class="text-sm text-blue-600 hover:text-blue-700 font-medium">Manage</button>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fa-solid fa-briefcase text-indigo-600 mr-2"></i>Employment Information
+                    </h3>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="border border-gray-200 rounded-xl p-4 hover:border-green-300 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i class="fa-solid fa-file-pdf"></i></div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Employment Contracts</p>
-                                <p class="text-xs text-gray-500">1,248 files</p>
+
+                <form>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-5">
+                        
+                        <!-- COLUMN 1 -->
+                        <div class="space-y-5">
+                            <!-- Status -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Status:</label>
+                                <select class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600 appearance-none cursor-pointer">
+                                    <option value="regular">R-Regular</option>
+                                    <option value="probationary">Probationary</option>
+                                    <option value="contractual">Contractual</option>
+                                </select>
+                            </div>
+
+                            <!-- Remarks -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Remarks:</label>
+                                <input type="text" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="09-1-0152">
+                            </div>
+
+                            <!-- Position -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Position:</label>
+                                <select class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600 appearance-none cursor-pointer">
+                                    <option value="supervisor">SUPERVISOR</option>
+                                    <option value="manager">MANAGER</option>
+                                    <option value="staff">STAFF</option>
+                                </select>
+                            </div>
+
+                            <!-- Company Connected -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Company:</label>
+                                <input type="text" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="W GLOBAL REALTY, INC - HOUSEKEEPING">
+                            </div>
+
+                            <!-- Branch -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Branch:</label>
+                                <select class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600 appearance-none cursor-pointer">
+                                    <option value="">>> Select branch</option>
+                                    <option value="main">Main Branch</option>
+                                    <option value="north">North Branch</option>
+                                </select>
+                            </div>
+
+                            <!-- Department -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Department:</label>
+                                <select class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600 appearance-none cursor-pointer">
+                                    <option value="ladies">Ladies accessories</option>
+                                    <option value="mens">Mens wear</option>
+                                    <option value="electronics">Electronics</option>
+                                </select>
+                            </div>
+
+                            <!-- Contract Information (Header) -->
+                            <div class="pt-4 border-t border-gray-200">
+                                <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4">Contract Information</h4>
+                            </div>
+
+                            <!-- Date Hired -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Date Hired:</label>
+                                <input type="date" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600">
+                            </div>
+
+                            <!-- Date Resigned -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Date Resigned:</label>
+                                <input type="date" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600">
                             </div>
                         </div>
-                    </div>
-                    <div class="border border-gray-200 rounded-xl p-4 hover:border-green-300 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-id-card"></i></div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Government IDs</p>
-                                <p class="text-xs text-gray-500">1,180 verified</p>
+
+                        <!-- COLUMN 2 -->
+                        <div class="space-y-5">
+                            <!-- Start Contract -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Start Contract:</label>
+                                <input type="date" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600">
+                            </div>
+
+                            <!-- End Contract -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">End Contract:</label>
+                                <input type="date" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600">
+                            </div>
+
+                            <!-- Rate Basis -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Rate Basis:</label>
+                                <select class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600 appearance-none cursor-pointer">
+                                    <option value="daily">Daily</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="hourly">Hourly</option>
+                                </select>
+                            </div>
+
+                            <!-- Month No -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Month No:</label>
+                                <input type="number" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="6">
+                            </div>
+
+                            <!-- Hourly Rate -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Hourly Rate:</label>
+                                <input type="number" step="0.01" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="86.63">
+                            </div>
+
+                            <!-- Daily Rate -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Daily Rate:</label>
+                                <input type="number" step="0.01" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="645">
+                            </div>
+
+                            <!-- Monthly Rate -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Monthly Rate:</label>
+                                <input type="number" step="0.01" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="14821.6">
+                            </div>
+
+                            <!-- Date Reg -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Date Reg:</label>
+                                <input type="date" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600">
+                            </div>
+
+                            <!-- Date Prob -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Date Prob:</label>
+                                <input type="date" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600">
                             </div>
                         </div>
-                    </div>
-                    <div class="border border-gray-200 rounded-xl p-4 hover:border-green-300 transition">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-green-100 text-green-600 p-2 rounded-lg"><i class="fa-solid fa-certificate"></i></div>
-                            <div>
-                                <p class="font-medium text-gray-800 text-sm">Certifications</p>
-                                <p class="text-xs text-gray-500">856 records</p>
+
+                        <!-- COLUMN 3 -->
+                        <div class="space-y-5">
+                            <!-- Insurance No -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Insurance No:</label>
+                                <input type="text" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="">
+                            </div>
+
+                            <!-- Agency Fee -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Agency Fee:</label>
+                                <input type="number" step="0.01" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="12">
+                            </div>
+
+                            <!-- Agency -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Agency:</label>
+                                <select class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-600 appearance-none cursor-pointer">
+                                    <option value="SPAI">SPAI</option>
+                                    <option value="none">None</option>
+                                </select>
+                            </div>
+
+                            <!-- Account No -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Account No:</label>
+                                <input type="text" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="109661898696">
+                            </div>
+
+                            <!-- Expanded Tax -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Expanded Tax:</label>
+                                <input type="text" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="">
+                            </div>
+
+                            <!-- Allowance -->
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+                                <label class="sm:w-32 text-sm font-bold text-gray-700 shrink-0">Allowance:</label>
+                                <input type="number" step="0.01" class="flex-1 px-4 py-2.5 bg-gray-100 border-transparent rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all" placeholder="0">
+                            </div>
+
+                            <!-- With Ecol Checkbox -->
+                            <div class="flex items-center gap-3 pt-2">
+                                <input type="checkbox" id="withEcol" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500 focus:ring-2 cursor-pointer">
+                                <label for="withEcol" class="text-sm font-bold text-gray-700 cursor-pointer">With Ecol</label>
                             </div>
                         </div>
+
                     </div>
-                </div>
+                </form>
             </div>
 
-  
+
+
+           <!-- 5. BIG MODERN BOX (Employment History) -->
+<div class="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 border border-gray-100 p-6 mb-6">
+    <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-800">
+            <i class="fa-solid fa-clock-rotate-left text-indigo-600 mr-2"></i>Employment History
+        </h3>
+    </div>
+
+    <!-- Table Container (Responsive) -->
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+        <table class="w-full text-sm text-left text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th scope="col" class="px-6 py-3 font-bold">Agency</th>
+                    <th scope="col" class="px-6 py-3 font-bold">ControlNo</th>
+                    <th scope="col" class="px-6 py-3 font-bold">ClientName</th>
+                    <th scope="col" class="px-6 py-3 font-bold">StartContract</th>
+                    <th scope="col" class="px-6 py-3 font-bold">EndContract</th>
+                    <th scope="col" class="px-6 py-3 font-bold text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                <!-- Empty State Row -->
+                <tr>
+                    <td colspan="6" class="px-6 py-12 text-center">
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fa-solid fa-inbox text-4xl text-gray-300 mb-3"></i>
+                            <p class="text-sm font-medium text-gray-500">No employment history records found.</p>
+                            <p class="text-xs text-gray-400 mt-1">Click "Add Record" to create a new entry.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
