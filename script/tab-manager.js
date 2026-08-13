@@ -1,13 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // =========================================================
-    // LOCAL STORAGE KEY
-    // =========================================================
     const STORAGE_KEY = 'epayroll_open_tabs';
-
-    // =========================================================
-    // ELEMENTS
-    // =========================================================
-
     const tabList = document.getElementById('tabList');
     const tabContent = document.getElementById('tabContent');
 
@@ -15,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // =========================================================
-    // RESTORE TABS FROM LOCAL STORAGE
-    // =========================================================
+    const PAGE_SCRIPTS = {
+        'ticket-tab.php': '/ticketing/admin/script/ticket-tab.js'
+    };
 
     async function restoreSavedTabs() {
         const savedTabs = getSavedTabs();
@@ -26,29 +18,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Create ALL tabs first WITHOUT activating any
         const loadPromises = [];
 
         for (const tab of savedTabs) {
             const { tabId, tabTitle, tabIcon, page } = tab;
 
-            // Skip if tab already exists (e.g., dashboard from HTML)
             const existingTab = document.querySelector(
                 `.tab-item[data-tab-id="${tabId}"]`
             );
 
             if (!existingTab && tabId !== 'dashboard') {
                 loadPromises.push(
-                    createTabWithoutActivating(tabId, tabTitle, tabIcon, page)
+                    createTabWithoutActivating(
+                        tabId,
+                        tabTitle,
+                        tabIcon,
+                        page
+                    )
                 );
             }
         }
 
-        // Wait for all tabs to finish loading
         await Promise.all(loadPromises);
 
-        // NOW activate the last active tab
-        const lastActiveTabId = localStorage.getItem('epayroll_active_tab');
+        const lastActiveTabId = localStorage.getItem(
+            'epayroll_active_tab'
+        );
 
         if (lastActiveTabId) {
             const activeTab = document.querySelector(
@@ -58,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeTab) {
                 activateTab(lastActiveTabId);
             } else {
-                // Fallback: activate first available tab
                 const firstTab = document.querySelector('.tab-item');
+
                 if (firstTab) {
                     activateTab(firstTab.dataset.tabId);
                 }
@@ -67,12 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================================
-    // CREATE TAB WITHOUT ACTIVATING (for restore only)
-    // =========================================================
-
-    async function createTabWithoutActivating(tabId, tabTitle, tabIcon, page) {
-        // Check again to avoid duplicates
+    async function createTabWithoutActivating(
+        tabId,
+        tabTitle,
+        tabIcon,
+        page
+    ) {
         const existingTab = document.querySelector(
             `.tab-item[data-tab-id="${tabId}"]`
         );
@@ -81,12 +76,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Create tab button
-        const tabButton = createTabButton(tabId, tabTitle, tabIcon, page);
+        const tabButton = createTabButton(
+            tabId,
+            tabTitle,
+            tabIcon,
+            page
+        );
+
         tabList.appendChild(tabButton);
 
-        // Create content panel
         const panel = document.createElement('div');
+
         panel.id = `tab-${tabId}`;
         panel.className = 'tab-panel hidden';
 
@@ -103,13 +103,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tabContent.appendChild(panel);
 
-        // Load content WITHOUT activating
         await loadTabContent(panel, page, tabTitle);
     }
-
-    // =========================================================
-    // HELPER: Get saved tabs from localStorage
-    // =========================================================
 
     function getSavedTabs() {
         try {
@@ -121,47 +116,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================================
-    // HELPER: Save tabs to localStorage
-    // =========================================================
-
     function saveTabs() {
         const tabs = [];
 
         document.querySelectorAll('.tab-item').forEach(tabButton => {
             const tabId = tabButton.dataset.tabId;
 
-            // Skip dashboard since it's always in HTML
             if (tabId === 'dashboard') {
                 return;
             }
 
             tabs.push({
                 tabId: tabId,
-                tabTitle: tabButton.dataset.tabTitle || tabButton.querySelector('span')?.textContent,
-                tabIcon: tabButton.dataset.tabIcon || 'fa-solid fa-file',
+                tabTitle:
+                    tabButton.dataset.tabTitle ||
+                    tabButton.querySelector('span')?.textContent,
+                tabIcon:
+                    tabButton.dataset.tabIcon ||
+                    'fa-solid fa-file',
                 page: tabButton.dataset.page
             });
         });
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(tabs));
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify(tabs)
+        );
     }
-
-    // =========================================================
-    // HELPER: Save active tab to localStorage
-    // =========================================================
 
     function saveActiveTab(tabId) {
-        localStorage.setItem('epayroll_active_tab', tabId);
+        localStorage.setItem(
+            'epayroll_active_tab',
+            tabId
+        );
     }
 
-    // =========================================================
-    // DELEGATED CLICK HANDLER
-    // Handles sidebar links AND tab bar buttons (including dashboard)
-    // =========================================================
-
-    document.addEventListener('click', (event) => {
-        // Handle sidebar .tab-link clicks
+    document.addEventListener('click', event => {
         const link = event.target.closest('.tab-link');
 
         if (link) {
@@ -170,61 +160,79 @@ document.addEventListener('DOMContentLoaded', () => {
             const page = link.dataset.page;
             const tabId = link.dataset.tabId;
             const tabTitle = link.dataset.tabTitle;
-            const tabIcon = link.dataset.tabIcon || 'fa-solid fa-file';
+            const tabIcon =
+                link.dataset.tabIcon ||
+                'fa-solid fa-file';
 
             if (!page || !tabId || !tabTitle) {
-                console.error('Missing tab data attributes.', link);
+                console.error(
+                    'Missing tab data attributes.',
+                    link
+                );
                 return;
             }
 
-            openTab(tabId, tabTitle, tabIcon, page, true);
+            openTab(
+                tabId,
+                tabTitle,
+                tabIcon,
+                page,
+                true
+            );
+
             return;
         }
 
-        // Handle tab bar button clicks (including dashboard)
         const tabButton = event.target.closest('.tab-item');
 
         if (tabButton) {
-            // If clicking close button
             if (event.target.closest('.tab-close')) {
                 event.stopPropagation();
+
                 const tabId = tabButton.dataset.tabId;
+
                 if (tabId) {
                     closeTab(tabId);
                 }
+
                 return;
             }
 
-            // Otherwise activate tab
             const tabId = tabButton.dataset.tabId;
+
             if (tabId) {
                 activateTab(tabId);
             }
         }
     });
 
-    // =========================================================
-    // OPEN TAB
-    // =========================================================
-
-    async function openTab(tabId, tabTitle, tabIcon, page, saveToStorage = true) {
-        // Check if tab already exists
-        let existingTab = document.querySelector(
+    async function openTab(
+        tabId,
+        tabTitle,
+        tabIcon,
+        page,
+        saveToStorage = true
+    ) {
+        const existingTab = document.querySelector(
             `.tab-item[data-tab-id="${tabId}"]`
         );
 
-        // If tab already exists, simply activate it
         if (existingTab) {
             activateTab(tabId);
             return;
         }
 
-        // Create new tab
-        const tabButton = createTabButton(tabId, tabTitle, tabIcon, page);
+        const tabButton = createTabButton(
+            tabId,
+            tabTitle,
+            tabIcon,
+            page
+        );
+
         tabList.appendChild(tabButton);
 
-        // Create content panel
         const panel = document.createElement('div');
+
         panel.id = `tab-${tabId}`;
         panel.className = 'tab-panel hidden';
 
@@ -241,23 +249,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tabContent.appendChild(panel);
 
-        // Activate immediately
         activateTab(tabId);
 
-        // Load PHP page
-        await loadTabContent(panel, page, tabTitle);
+        await loadTabContent(
+            panel,
+            page,
+            tabTitle
+        );
 
-        // Save to localStorage
         if (saveToStorage) {
             saveTabs();
         }
     }
 
-    // =========================================================
-    // CREATE TAB BUTTON
-    // =========================================================
-
-    function createTabButton(tabId, tabTitle, tabIcon, page) {
+    function createTabButton(
+        tabId,
+        tabTitle,
+        tabIcon,
+        page
+    ) {
         const button = document.createElement('button');
 
         button.type = 'button';
@@ -281,18 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
             </span>
         `;
 
-        // No individual addEventListener needed here
-        // All clicks handled by delegated click listener above
-
         return button;
     }
 
-    // =========================================================
-    // ACTIVATE TAB
-    // =========================================================
-
     function activateTab(tabId) {
-        // Remove active state from all tabs
         document.querySelectorAll('.tab-item').forEach(tab => {
             tab.classList.remove(
                 'active',
@@ -306,12 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
             );
         });
 
-        // Hide all panels
         document.querySelectorAll('.tab-panel').forEach(panel => {
             panel.classList.add('hidden');
         });
 
-        // Activate selected tab
         const selectedTab = document.querySelector(
             `.tab-item[data-tab-id="${tabId}"]`
         );
@@ -337,7 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedPanel.classList.remove('hidden');
         }
 
-        // Scroll active tab into view
         if (selectedTab) {
             selectedTab.scrollIntoView({
                 behavior: 'smooth',
@@ -346,15 +345,14 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Save active tab to localStorage
         saveActiveTab(tabId);
     }
 
-    // =========================================================
-    // LOAD TAB CONTENT
-    // =========================================================
-
-    async function loadTabContent(panel, page, tabTitle) {
+    async function loadTabContent(
+        panel,
+        page,
+        tabTitle
+    ) {
         try {
             const response = await fetch(page, {
                 method: 'GET',
@@ -373,10 +371,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             panel.innerHTML = html;
 
-            // Execute scripts found in loaded content
-            executeScripts(panel);
+            await loadPageScript(
+                panel,
+                page
+            );
         } catch (error) {
-            console.error('Failed to load tab:', error);
+            console.error(
+                'Failed to load tab:',
+                error
+            );
 
             panel.innerHTML = `
                 <div class="container mx-auto px-6 py-10">
@@ -384,15 +387,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="text-red-500 text-4xl mb-4">
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </div>
-
                         <h2 class="text-xl font-semibold text-gray-800 mb-2">
                             Unable to Load Page
                         </h2>
-
                         <p class="text-gray-500 mb-4">
                             The ${escapeHtml(tabTitle)} page could not be loaded.
                         </p>
-
                         <button
                             type="button"
                             onclick="location.reload()"
@@ -406,12 +406,50 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // =========================================================
-    // CLOSE TAB
-    // =========================================================
+    async function loadPageScript(
+        container,
+        page
+    ) {
+        const pageName = page
+            .split('/')
+            .pop()
+            .split('?')[0];
+
+        const scriptPath =
+            PAGE_SCRIPTS[pageName];
+
+        if (!scriptPath) {
+            return;
+        }
+
+        try {
+            const script = document.createElement('script');
+
+            script.src = scriptPath;
+            script.dataset.pageScript = pageName;
+
+            await new Promise((resolve, reject) => {
+                script.onload = resolve;
+                script.onerror = reject;
+
+                document.body.appendChild(script);
+            });
+
+            if (
+                pageName === 'ticket-tab.php' &&
+                typeof initTicketTab === 'function'
+            ) {
+                initTicketTab(container);
+            }
+        } catch (error) {
+            console.error(
+                `Failed to load page script: ${scriptPath}`,
+                error
+            );
+        }
+    }
 
     function closeTab(tabId) {
-        // Dashboard cannot be closed
         if (tabId === 'dashboard') {
             return;
         }
@@ -428,75 +466,41 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Check if currently active
-        const isActive = tab.classList.contains('active');
+        const isActive =
+            tab.classList.contains('active');
 
-        // Remove tab
         tab.remove();
-
-        // Remove content
         panel.remove();
 
-        // Update localStorage
         saveTabs();
 
-        // If closed tab was active
         if (isActive) {
-            // Find last available tab
-            const remainingTabs = document.querySelectorAll(
-                '.tab-item'
-            );
+            const remainingTabs =
+                document.querySelectorAll(
+                    '.tab-item'
+                );
 
             if (remainingTabs.length > 0) {
                 const lastTab =
-                    remainingTabs[remainingTabs.length - 1];
+                    remainingTabs[
+                        remainingTabs.length - 1
+                    ];
 
-                activateTab(lastTab.dataset.tabId);
+                activateTab(
+                    lastTab.dataset.tabId
+                );
             }
         }
     }
 
-    // =========================================================
-    // EXECUTE SCRIPTS FROM LOADED PAGE
-    // =========================================================
-
-    function executeScripts(container) {
-        const scripts = container.querySelectorAll('script');
-
-        scripts.forEach(oldScript => {
-            const newScript = document.createElement('script');
-
-            // Copy attributes
-            Array.from(oldScript.attributes).forEach(attribute => {
-                newScript.setAttribute(
-                    attribute.name,
-                    attribute.value
-                );
-            });
-
-            // Copy inline script
-            newScript.textContent = oldScript.textContent;
-
-            oldScript.replaceWith(newScript);
-        });
-    }
-
-    // =========================================================
-    // ESCAPE HTML
-    // Prevents HTML injection in tab titles
-    // =========================================================
-
     function escapeHtml(value) {
-        const div = document.createElement('div');
+        const div =
+            document.createElement('div');
 
         div.textContent = value;
 
         return div.innerHTML;
     }
-
-    // =========================================================
-    // RESTORE TABS ON PAGE LOAD
-    // =========================================================
 
     restoreSavedTabs();
 });

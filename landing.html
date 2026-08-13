@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QSI Support | Help that arrives on time</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          forest:  { DEFAULT: '#0a5d3c', 50:'#eef6f1', 100:'#d9ecdf', 600:'#0a5d3c', 700:'#084a30' },
+          teal:    { DEFAULT: '#0d9488', 50:'#eafbf8' },
+          sage:    { 50:'#f6f9f7', 100:'#eef4f1', 300:'#c9d9d1', 600:'#5b7568', 800:'#233a30' },
+          amber:   { DEFAULT: '#f2b134' },
+          ink:     '#0f2018',
+        },
+        fontFamily: {
+          display: ['Sora', 'sans-serif'],
+          body: ['Inter', 'sans-serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
+      }
+    }
+  }
+</script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  section[id] { scroll-margin-top: 96px; }
+
+  /* Ticket-stub signature: perforated edge using repeating dashed border + punched notches */
+  .ticket-stub {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e3ede8;
+  }
+  .ticket-stub::before,
+  .ticket-stub::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    background: #f6f9f7;
+    border: 1px solid #e3ede8;
+    border-radius: 9999px;
+    transform: translateY(-50%);
+  }
+  .ticket-stub::before { left: -10px; }
+  .ticket-stub::after  { right: -10px; }
+  .ticket-perf {
+    border-left: 2px dashed #d7e4de;
+  }
+
+  .noise-bg {
+    background-image: radial-gradient(circle at 1px 1px, #0a5d3c14 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px) rotate(-2deg); }
+    50%      { transform: translateY(-10px) rotate(-2deg); }
+  }
+  @keyframes float-slow-rev {
+    0%, 100% { transform: translateY(0px) rotate(3deg); }
+    50%      { transform: translateY(-14px) rotate(3deg); }
+  }
+  .float-a { animation: float-slow 6s ease-in-out infinite; }
+  .float-b { animation: float-slow-rev 7s ease-in-out infinite; }
+</style>
+</head>
+
+<body class="bg-sage-50 text-ink font-body antialiased">
+
+<!-- ================= HEADER / NAV ================= -->
+<header class="sticky top-0 z-50 bg-sage-50/80 backdrop-blur-md border-b border-sage-100">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-20 grid grid-cols-2 sm:grid-cols-3 items-center">
+
+    <!-- Logo -->
+    <a href="#top" class="flex items-center gap-2.5 justify-self-start">
+      <div class="w-9 h-9 rounded-lg bg-forest flex items-center justify-center shadow-sm shadow-forest/20">
+        <i class="fa-solid fa-ticket text-white text-sm"></i>
+      </div>
+      <span class="font-display font-bold text-lg tracking-tight text-forest-700">QSI<span class="text-teal">.</span></span>
+    </a>
+
+    <!-- Centered Nav -->
+    <nav class="hidden sm:flex items-center justify-center gap-10 font-display text-sm font-medium text-sage-800">
+      <a href="#top" class="relative hover:text-forest-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-teal after:transition-all hover:after:w-full">Home</a>
+      <a href="#guide" class="relative hover:text-forest-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-teal after:transition-all hover:after:w-full">Guide</a>
+      <a href="#about" class="relative hover:text-forest-600 transition-colors after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-teal after:transition-all hover:after:w-full">About</a>
+    </nav>
+
+    <!-- Mobile nav toggle (simple, no JS needed beyond native details) -->
+    <details class="sm:hidden justify-self-end relative">
+      <summary class="list-none w-9 h-9 rounded-lg border border-sage-300 flex items-center justify-center cursor-pointer">
+        <i class="fa-solid fa-bars text-sage-800 text-sm"></i>
+      </summary>
+      <div class="absolute right-0 mt-3 w-40 bg-white border border-sage-100 rounded-xl shadow-lg p-2 font-display text-sm font-medium text-sage-800">
+        <a href="#top" class="block px-3 py-2 rounded-lg hover:bg-sage-50">Home</a>
+        <a href="#guide" class="block px-3 py-2 rounded-lg hover:bg-sage-50">Guide</a>
+        <a href="#about" class="block px-3 py-2 rounded-lg hover:bg-sage-50">About</a>
+      </div>
+    </details>
+
+    <span class="hidden sm:block"></span>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section id="top" class="relative overflow-hidden noise-bg">
+  <div class="max-w-4xl mx-auto px-6 pt-20 pb-24 lg:pt-28 lg:pb-32 text-center relative z-10">
+
+    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-sage-300 font-mono text-xs text-sage-600 shadow-sm">
+      <span class="w-1.5 h-1.5 rounded-full bg-teal animate-pulse"></span>
+      STATUS: SUPPORT DESK ONLINE
+    </span>
+
+    <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl tracking-tight text-ink mt-6 leading-[1.08]">
+      Help that arrives<br class="hidden sm:block"> on time.
+    </h1>
+
+    <p class="text-sage-600 text-base sm:text-lg mt-5 max-w-xl mx-auto leading-relaxed">
+      One desk for IT, payroll, and HR concerns at QSI. Log a ticket, track it end to end, and get an answer from a real person — no guesswork.
+    </p>
+
+    <div class="mt-9 flex flex-col items-center gap-4">
+      <a href="#ask-support" class="group inline-flex items-center gap-2.5 bg-forest hover:bg-teal text-white font-display font-semibold text-base px-8 py-4 rounded-2xl shadow-xl shadow-forest/20 transition-all duration-300 hover:-translate-y-0.5">
+        <i class="fa-solid fa-headset"></i>
+        Ask Support
+        <i class="fa-solid fa-arrow-right text-sm transition-transform group-hover:translate-x-1"></i>
+      </a>
+      <p class="font-mono text-xs text-sage-600">avg. first response &nbsp;<span class="text-forest-700 font-semibold">4m 12s</span></p>
+    </div>
+  </div>
+
+  <!-- Floating ticket-stub signature visuals -->
+  <div class="hidden lg:block absolute top-24 left-[6%] w-56 float-a">
+    <div class="ticket-stub rounded-2xl px-5 py-4 shadow-xl shadow-forest/5 -rotate-2">
+      <p class="font-mono text-[10px] text-sage-600 tracking-wider">TCK-1001</p>
+      <p class="font-display font-semibold text-sm text-ink mt-1">Payroll module access</p>
+      <span class="inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-md bg-forest-50 text-forest-700 text-[11px] font-semibold">
+        <span class="w-1.5 h-1.5 rounded-full bg-forest"></span> Open
+      </span>
+    </div>
+  </div>
+
+  <div class="hidden lg:block absolute bottom-16 right-[6%] w-56 float-b">
+    <div class="ticket-stub rounded-2xl px-5 py-4 shadow-xl shadow-forest/5 rotate-3">
+      <p class="font-mono text-[10px] text-sage-600 tracking-wider">TCK-1002</p>
+      <p class="font-display font-semibold text-sm text-ink mt-1">Leave credit correction</p>
+      <span class="inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-md bg-amber/10 text-amber-700 text-[11px] font-semibold">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber"></span> Pending
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GUIDE ================= -->
+<section id="guide" class="bg-white border-t border-sage-100">
+  <div class="max-w-6xl mx-auto px-6 py-20 lg:py-28">
+
+    <div class="text-center max-w-xl mx-auto">
+      <span class="font-mono text-xs tracking-widest text-teal font-semibold">HOW IT WORKS</span>
+      <h2 class="font-display font-bold text-3xl sm:text-4xl text-ink mt-3">Three steps to a resolved ticket</h2>
+      <p class="text-sage-600 mt-4">No portals to hunt for, no forms that go nowhere. Just a clear line from problem to fix.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-8 lg:gap-6 mt-16">
+
+      <!-- Step 01 -->
+      <div class="ticket-stub ticket-perf rounded-2xl p-7 hover:shadow-lg hover:shadow-forest/5 hover:-translate-y-1 transition-all duration-300">
+        <span class="font-mono text-xs text-teal font-semibold">STEP / 01</span>
+        <div class="w-11 h-11 rounded-xl bg-forest-50 text-forest-600 flex items-center justify-center mt-4">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
+        <h3 class="font-display font-semibold text-lg text-ink mt-4">Submit a ticket</h3>
+        <p class="text-sm text-sage-600 mt-2 leading-relaxed">Describe your issue, pick a department, attach a screenshot if it helps. Takes under a minute.</p>
+      </div>
+
+      <!-- Step 02 -->
+      <div class="ticket-stub ticket-perf rounded-2xl p-7 hover:shadow-lg hover:shadow-forest/5 hover:-translate-y-1 transition-all duration-300">
+        <span class="font-mono text-xs text-teal font-semibold">STEP / 02</span>
+        <div class="w-11 h-11 rounded-xl bg-forest-50 text-forest-600 flex items-center justify-center mt-4">
+          <i class="fa-solid fa-magnifying-glass-chart"></i>
+        </div>
+        <h3 class="font-display font-semibold text-lg text-ink mt-4">Track it live</h3>
+        <p class="text-sm text-sage-600 mt-2 leading-relaxed">Every ticket carries a status — Open, Pending, Resolved — so you always know where it stands.</p>
+      </div>
+
+      <!-- Step 03 -->
+      <div class="ticket-stub ticket-perf rounded-2xl p-7 hover:shadow-lg hover:shadow-forest/5 hover:-translate-y-1 transition-all duration-300">
+        <span class="font-mono text-xs text-teal font-semibold">STEP / 03</span>
+        <div class="w-11 h-11 rounded-xl bg-forest-50 text-forest-600 flex items-center justify-center mt-4">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h3 class="font-display font-semibold text-lg text-ink mt-4">Get it resolved</h3>
+        <p class="text-sm text-sage-600 mt-2 leading-relaxed">A support agent replies directly on your ticket. Close it out once you're good to go.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section id="about" class="bg-sage-50 border-t border-sage-100">
+  <div class="max-w-6xl mx-auto px-6 py-20 lg:py-28 grid lg:grid-cols-2 gap-14 items-center">
+
+    <div>
+      <span class="font-mono text-xs tracking-widest text-teal font-semibold">ABOUT THE DESK</span>
+      <h2 class="font-display font-bold text-3xl sm:text-4xl text-ink mt-3 leading-tight">Built by QSI, for QSI.</h2>
+      <p class="text-sage-600 mt-5 leading-relaxed">
+        The QSI Support Desk is our internal ticketing system for IT, payroll, and HR requests — replacing scattered emails and chat threads with one place every request can be seen, tracked, and answered.
+      </p>
+      <p class="text-sage-600 mt-4 leading-relaxed">
+        It's maintained by the internal support team and used across every department, from onboarding to payroll disputes to a laptop that won't turn on.
+      </p>
+
+      <a href="#ask-support" class="inline-flex items-center gap-2 mt-7 text-forest-700 font-display font-semibold text-sm hover:text-teal transition-colors">
+        Talk to the support team
+        <i class="fa-solid fa-arrow-right text-xs"></i>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 gap-5">
+      <div class="ticket-stub rounded-2xl p-6">
+        <p class="font-display font-extrabold text-3xl text-forest-700">12k<span class="text-teal">+</span></p>
+        <p class="font-mono text-[11px] text-sage-600 mt-2 tracking-wide">TICKETS RESOLVED</p>
+      </div>
+      <div class="ticket-stub rounded-2xl p-6">
+        <p class="font-display font-extrabold text-3xl text-forest-700">4m</p>
+        <p class="font-mono text-[11px] text-sage-600 mt-2 tracking-wide">AVG. FIRST REPLY</p>
+      </div>
+      <div class="ticket-stub rounded-2xl p-6">
+        <p class="font-display font-extrabold text-3xl text-forest-700">6</p>
+        <p class="font-mono text-[11px] text-sage-600 mt-2 tracking-wide">DEPARTMENTS COVERED</p>
+      </div>
+      <div class="ticket-stub rounded-2xl p-6">
+        <p class="font-display font-extrabold text-3xl text-forest-700">24/7</p>
+        <p class="font-mono text-[11px] text-sage-600 mt-2 tracking-wide">SUBMIT ANYTIME</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= CTA STRIP ================= -->
+<section id="ask-support" class="bg-forest">
+  <div class="max-w-4xl mx-auto px-6 py-16 text-center">
+    <h2 class="font-display font-bold text-2xl sm:text-3xl text-white">Something not working?</h2>
+    <p class="text-forest-100/80 mt-3">Log it now — the desk is monitored during business hours and beyond.</p>
+    <a href="/ticketing/includes/login.php" class="inline-flex items-center gap-2.5 bg-white hover:bg-sage-50 text-forest-700 font-display font-semibold text-base px-8 py-4 rounded-2xl shadow-xl mt-7 transition-all duration-300 hover:-translate-y-0.5">
+      <i class="fa-solid fa-headset"></i>
+      Ask Support
+    </a>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="bg-ink">
+  <div class="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 rounded-md bg-forest flex items-center justify-center">
+        <i class="fa-solid fa-ticket text-white text-xs"></i>
+      </div>
+      <span class="font-display font-semibold text-sm text-white">QSI Support Desk</span>
+    </div>
+    <p class="text-xs text-sage-300 font-mono">© 2026 QSI Inc. All rights reserved.</p>
+  </div>
+</footer>
+
+</body>
+</html>

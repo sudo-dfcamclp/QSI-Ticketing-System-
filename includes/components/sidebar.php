@@ -1,19 +1,4 @@
-<?php
-/**
- * Reusable Ticketing Sidebar
- *
- * Works with:
- * /ePayroll/script/sidebar.js
- * /ePayroll/script/tab-manager.js
- *
- * Navigation:
- * - Ticket Tab
- * - Manage Users
- * - Print
- */
-?>
 
-<!-- CSS -->
 <link href="/ePayroll/src/output.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -128,9 +113,9 @@
         <!-- =================================================
              TICKET TAB
         ================================================== -->
-        <a href="#"
+        <a href="/admin/ticket-tab.php"
             class="tab-link sidebar-nav-link flex items-center gap-3 px-3 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group"
-            data-page="/ePayroll/ticket/ticket.php"
+            data-page="/ticketing/admin/ticket-tab.php"
             data-tab-id="ticket"
             data-tab-title="Ticket Tab"
             data-tab-icon="fa-solid fa-ticket">
@@ -190,7 +175,7 @@
     <div class="p-3 border-t border-gray-200 bg-gray-50 shrink-0">
 
         <!-- SETTINGS -->
-        <a href="#"
+        <a href="settings.php"
             class="tab-link sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors mb-1"
             data-page="/ePayroll/includes/settings.php"
             data-tab-id="settings"
@@ -207,7 +192,7 @@
 
 
         <!-- LOGOUT -->
-        <a href="#"
+        <a href="logout.php"
             class="sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
 
             <i class="fa-solid fa-right-from-bracket text-lg shrink-0 w-5 text-center"></i>
