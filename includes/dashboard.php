@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ePayroll - Dashboard</title>
-
-    <!-- Tailwind CSS -->
+    <title>QSI Ticketing</title>
     <link href="/ePayroll/src/output.css" rel="stylesheet">
 </head>
 
