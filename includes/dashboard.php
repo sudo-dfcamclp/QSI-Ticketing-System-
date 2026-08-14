@@ -13,6 +13,7 @@ require_once __DIR__ . '/auth/auth.php';
     <link href="/ticketing/src/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="bg-gray-100 min-h-screen">
@@ -45,18 +46,44 @@ require_once __DIR__ . '/auth/auth.php';
             <!-- TAB CONTENT -->
             <div id="tabContent" class="min-h-[calc(100vh-57px)]">
 
-                <!-- DASHBOARD TAB -->
-                <div id="tab-dashboard" class="tab-panel">
+                                <!-- DASHBOARD TAB -->
+                    <div id="tab-dashboard" class="tab-panel">
 
-                    <div class="container mx-auto px-6 py-12 max-w-7xl">
+                        <div class="container mx-auto px-6 py-12 max-w-7xl">
 
-                        <!-- PAGE HEADER -->
-                        <div class="mt-8 mb-8">
-                            <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
-                            <p class="text-gray-500 mt-1">
-                                Welcome back! Here's your ticketing system overview.
-                            </p>
-                        </div>
+                            <!-- PAGE HEADER -->
+                            <div class="mt-8 mb-8 flex items-center justify-between">
+
+                                <!-- LEFT SIDE: DASHBOARD TITLE -->
+                                <div>
+                                    <h1 class="text-3xl font-bold text-gray-800">
+                                        Dashboard
+                                    </h1>
+
+                                    <p class="text-gray-500 mt-1">
+                                        Welcome back! Here's your ticketing system overview.
+                                    </p>
+                                </div>
+
+                                <!-- RIGHT SIDE: WELCOME + PROFILE -->
+                                <div class="flex items-center gap-3 bg-gray-100 rounded-2xl px-4 py-2.5">
+
+                                    <!-- WELCOME + NAME -->
+                                    <div class="text-right">
+                                        <p class="text-sm text-gray-500">
+                                            Welcome
+                                        </p>
+
+                                        <p class="text-2xl font-semibold text-gray-800">
+                                            Andrew
+                                        </p>
+                                    </div>
+                                    <!-- PROFILE CIRCLE -->
+                                    <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center font-semibold text-sm">AN</div>
+
+                                </div>
+
+                            </div>
 
                         <!-- DASHBOARD GRID -->
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

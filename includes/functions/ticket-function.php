@@ -22,7 +22,7 @@ class Ticket
         string $subject,
         string $description,
         string $priority = 'Normal',
-        string $status = 'Open'
+        string $status = 'Pending'
     ): bool {
         $sql = "
             INSERT INTO {$this->table}

@@ -41,7 +41,7 @@
                                     shadow-[0_2px_8px_rgba(0,0,0,0.18)]">
                             <img src="../assets/logo/logo.png" alt="QSI Logo" class="w-[30px] h-[30px] object-contain rounded-full">
                         </div>
-                        <span class="font-mono text-xs tracking-[0.12em] uppercase opacity-85">QSI Inc.</span>
+                        <span class="font-mono text-sm font-bold tracking-[0.12em] uppercase opacity-85">QSI Inc.</span>
                     </div>
 
                     <span class="font-mono text-[11px] tracking-[0.08em] uppercase whitespace-nowrap
@@ -54,7 +54,7 @@
                     Submit a support ticket
                 </h1>
                 <p class="relative text-sm text-white/[0.78] max-w-[40ch] m-0">
-                    Tell IT what's going on — we'll route it to the right queue.
+                    Tell IT what's going on  we'll route it to the right queue.
                 </p>
             </div>
 
@@ -172,7 +172,7 @@
                             name="description"
                             id="description"
                             rows="4"
-                            placeholder="Describe the issue in detail — what happened, when it started, anything you've already tried."
+                            placeholder="Describe the issue in detail"
                             required
                             class="w-full text-[14.5px] text-ink bg-surface border-[1.5px] border-hairline rounded-xl
                                    pt-3.5 pb-3.5 px-4 outline-none appearance-none resize-y min-h-[96px] leading-relaxed
@@ -183,6 +183,96 @@
                                    transition-colors duration-150 motion-reduce:transition-none"
                         ></textarea>
                     </div>
+                    <!-- Attachment -->
+<!-- Attachment -->
+<div class="mb-6">
+    <div class="flex items-baseline gap-2 mb-2.5">
+        <span class="font-mono text-[11px] text-pine font-semibold tracking-[0.04em]">05</span>
+        <span class="text-[13px] font-semibold text-ink">Attachment</span>
+        <span class="font-mono text-xs text-inkmuted ml-auto">optional</span>
+    </div>
+
+    <div
+        id="attachmentArea"
+        tabindex="0"
+        class="relative border-[1.5px] border-dashed border-hairline rounded-lg
+               bg-[#FBFCFB] px-3 py-3 text-center cursor-pointer
+               hover:border-pine hover:bg-pinetint
+               focus:border-pine focus:bg-pinetint
+               transition-colors duration-150"
+    >
+
+        <input
+            type="file"
+            name="attachment"
+            id="attachment"
+            class="hidden"
+            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+        >
+
+        <div id="attachmentEmpty" class="flex items-center justify-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-pinetint
+                        flex items-center justify-center shrink-0">
+                <i class="fa-solid fa-paperclip text-pine text-xs"></i>
+            </div>
+
+            <div class="text-left">
+                <p class="text-xs font-semibold text-ink">
+                    Add attachment
+                </p>
+
+                <p class="text-[10px] text-inkmuted">
+                    Click to browse or Ctrl+V to paste
+                </p>
+            </div>
+        </div>
+
+        <!-- Preview -->
+        <div id="attachmentPreview" class="hidden">
+            <div class="flex items-center gap-2 text-left">
+
+                <div id="attachmentIcon"
+                     class="w-8 h-8 rounded-lg bg-pinetint
+                            flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-file text-pine text-xs"></i>
+                </div>
+
+                <div class="min-w-0 flex-1">
+                    <p id="attachmentName"
+                       class="text-xs font-semibold text-ink truncate">
+                    </p>
+
+                    <p id="attachmentSize"
+                       class="text-[10px] text-inkmuted">
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    id="removeAttachment"
+                    class="w-7 h-7 rounded-md text-inkmuted
+                           hover:text-red-600 hover:bg-red-50
+                           flex items-center justify-center"
+                    title="Remove attachment"
+                >
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+
+            </div>
+
+            <div id="imagePreviewWrapper" class="hidden mt-2">
+                <img
+                    id="imagePreview"
+                    src=""
+                    alt="Attachment preview"
+                    class="max-h-40 max-w-full mx-auto rounded-md
+                           border border-hairline object-contain"
+                >
+            </div>
+        </div>
+
+    </div>
+</div>
                 </div>
 
                 <button

@@ -132,9 +132,9 @@
         <!-- =================================================
              MANAGE USERS
         ================================================== -->
-        <a href="#"
+        <a href="/admin/manage-user.php"
             class="tab-link sidebar-nav-link flex items-center gap-3 px-3 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group"
-            data-page="/ePayroll/includes/manage-users.php"
+            data-page="/ticketing/admin/Manage-user.php"
             data-tab-id="manage-users"
             data-tab-title="Manage Users"
             data-tab-icon="fa-solid fa-users">
@@ -151,9 +151,9 @@
         <!-- =================================================
              PRINT
         ================================================== -->
-        <a href="#"
+        <a href="/admin/print.php"
             class="tab-link sidebar-nav-link flex items-center gap-3 px-3 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors group"
-            data-page="/ePayroll/includes/print.php"
+            data-page="/ticketing/admin/print.php"
             data-tab-id="print"
             data-tab-title="Print"
             data-tab-icon="fa-solid fa-print">
@@ -177,7 +177,7 @@
         <!-- SETTINGS -->
         <a href="settings.php"
             class="tab-link sidebar-nav-link flex items-center gap-3 px-3 py-2.5 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors mb-1"
-            data-page="/ePayroll/includes/settings.php"
+            data-page="/ticketing/includes/settings.php"
             data-tab-id="settings"
             data-tab-title="Settings"
             data-tab-icon="fa-solid fa-gear">
