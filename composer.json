@@ -1,0 +1,8 @@
+{
+    "name": "ticketing/system",
+    "description": "Ticketing System - PDF report generation via dompdf",
+    "require": {
+        "php": ">=8.0",
+        "dompdf/dompdf": "^3.1"
+    }
+}

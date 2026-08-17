@@ -308,6 +308,7 @@ class Ticket
     }
 
 
+    
     /* =========================================================
        GET TICKETS BY STATUS
     ========================================================== */
@@ -339,4 +340,51 @@ class Ticket
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    /* =========================================================
+       GET RESOLVED TICKETS BY DATE RANGE (PARA SA PRINT REPORT)
+       -------------------------------------------------------
+       Ginagamit ito ng:
+         - admin/control/print-control.php (AJAX filter preview)
+         - admin/pdf.php (yung aktwal na PDF na iprint)
+
+       "Resolved" lang ang kasama dito, at ang pag-filter ng
+       date range ay base sa resolve_at column (hindi created_at)
+       dahil ang report ay tungkol sa mga ticket na NA-RESOLVE
+       sa loob ng napiling "From" - "To" na petsa.
+
+       $from / $to = 'YYYY-MM-DD' (mula sa <input type="date">)
+    ========================================================== */
+
+    public function getResolvedTicketsByDateRange(string $from, string $to): array
+    {
+        $sql = "
+            SELECT
+                ticket_id,
+                username,
+                department,
+                subject,
+                description,
+                priority,
+                status,
+                resolution,
+                created_at,
+                resolve_at
+            FROM {$this->table}
+            WHERE status = 'Resolved'
+              AND resolve_at IS NOT NULL
+              AND DATE(resolve_at) BETWEEN :date_from AND :date_to
+            ORDER BY resolve_at ASC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            ':date_from' => $from,
+            ':date_to'   => $to
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
+

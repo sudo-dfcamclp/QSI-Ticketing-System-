@@ -25,6 +25,11 @@ declare(strict_types=1);
 
 // Session check na JSON ang response (hindi redirect) kasi
 // AJAX ang tumatawag dito, hindi direktang browser navigation.
+//
+// Hiwalay na session name para sa Ticketing system — para
+// hindi mag-share ng session cookie/state sa ibang app
+// (hal. epayroll) na naka-host din sa parehong domain.
+session_name('ticketing_session');
 session_start();
 
 header('Content-Type: application/json; charset=utf-8');

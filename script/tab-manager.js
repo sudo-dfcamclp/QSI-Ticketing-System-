@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const STORAGE_KEY = 'epayroll_open_tabs';
+    const STORAGE_KEY = 'ticketing_open_tabs';
+    const ACTIVE_TAB_KEY = 'ticketing_active_tab';
     const tabList = document.getElementById('tabList');
     const tabContent = document.getElementById('tabContent');
 
@@ -8,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const PAGE_SCRIPTS = {
-        'ticket-tab.php': '/ticketing/admin/script/ticket-tab.js'
+        'ticket-tab.php': '/ticketing/admin/script/ticket-tab.js',
+        'print.php': '/ticketing/admin/script/print.js'
     };
 
     async function restoreSavedTabs() {
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await Promise.all(loadPromises);
 
         const lastActiveTabId = localStorage.getItem(
-            'epayroll_active_tab'
+            ACTIVE_TAB_KEY
         );
 
         if (lastActiveTabId) {
@@ -146,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveActiveTab(tabId) {
         localStorage.setItem(
-            'epayroll_active_tab',
+            ACTIVE_TAB_KEY,
             tabId
         );
     }
@@ -440,6 +442,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 typeof initTicketTab === 'function'
             ) {
                 initTicketTab(container);
+            }
+            
+             if (
+                pageName === 'print.php' &&
+                typeof initPrintTab === 'function'
+            ) {
+                initPrintTab(container);
             }
         } catch (error) {
             console.error(

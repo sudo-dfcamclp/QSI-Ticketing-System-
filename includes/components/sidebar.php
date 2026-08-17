@@ -1,5 +1,5 @@
 
-<link href="/ePayroll/src/output.css" rel="stylesheet">
+<link href="/ticketing/src/output.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -33,7 +33,7 @@
             onclick="handleLogoClick()"
             class="sidebar-logo w-10 h-10 rounded-xl flex items-center justify-center shrink-0 hover:bg-gray-100 transition-colors cursor-pointer">
 
-            <img src="/ePayroll/assets/logo/logo.png"
+            <img src="/ticketing/assets/logo/logo.png"
                 alt="QSI Logo"
                 class="w-10 h-10 object-contain">
 

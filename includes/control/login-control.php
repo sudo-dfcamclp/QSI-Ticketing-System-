@@ -1,6 +1,9 @@
-
 <?php
 
+// Hiwalay na session name para sa Ticketing system — para
+// hindi mag-share ng session cookie/state sa ibang app
+// (hal. epayroll) na naka-host din sa parehong domain.
+session_name('ticketing_session');
 session_start();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -162,4 +165,3 @@ try {
         'An unexpected server error occurred. Please try again.'
     );
 }
-
