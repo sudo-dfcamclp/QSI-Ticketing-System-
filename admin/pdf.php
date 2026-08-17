@@ -245,7 +245,7 @@ $html = <<<HTML
     <div class="header">
         {$logoImgTag}
         <div class="header-text">
-            <h1>Ticket Report — Resolved Tickets</h1>
+            <h1>Ticket Report | Resolved Tickets</h1>
             <p>Date Range: {$from} to {$to} &nbsp;|&nbsp; Generated: {$generatedAt}</p>
         </div>
     </div>
@@ -290,8 +290,5 @@ $dompdf = new Dompdf($options);
 $dompdf->loadHtml($html);
 $dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
-
-// 'inline' = ipapakita sa bagong tab; palitan ng 'attachment'
-// kung gusto mong direktang mag-download.
 $filename = 'ticket-report_' . $from . '_to_' . $to . '.pdf';
 $dompdf->stream($filename, ['Attachment' => false]);

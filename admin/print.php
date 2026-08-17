@@ -48,17 +48,6 @@
 
                     </div>
 
-
-                    <!-- =========================================
-                         DATE RANGE FILTER (From / To)
-                         -------------------------------------------
-                         "From" at "To" na date columns. Pag-click
-                         sa alinman dito ay nagbubukas ng native
-                         browser date picker (calendar). Pag napili
-                         na ang dalawa, mag-e-enable (green) ang
-                         Print button — hangga't hindi kumpleto,
-                         naka-gray-out ito (see print.js).
-                    ========================================== -->
                     <div class="flex flex-wrap items-center gap-3">
 
                         <div class="flex items-center gap-2 bg-canvas border border-hairline rounded-xl px-3 py-2">
@@ -91,11 +80,6 @@
 
                         </div>
 
-
-                        <!-- PRINT BUTTON -->
-                        <!-- Naka-disable/gray by default; pag kumpleto na
-                             ang From at To, ito ay ge-green at ma-e-enable
-                             (print.js ang bahalang mag-toggle ng state). -->
                         <button
                             type="button"
                             id="print-ticket-btn"

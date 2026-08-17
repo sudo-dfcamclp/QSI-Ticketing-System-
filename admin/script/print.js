@@ -1,26 +1,4 @@
-/* ==========================================================
-   PRINT REPORT TAB — frontend controller
-   -------------------------------------------------------------
-   Tinatawag ito ng script/tab-manager.js sa pamamagitan ng
-   initPrintTab(container) pagkatapos ma-inject yung print.php
-   HTML sa loob ng tab panel (dynamic load, kaya HINDI natin
-   ginagamit ang 'DOMContentLoaded' dito).
 
-   Hinati ang file na ito sa MALINAW na mga SEKSYON, bawat isa
-   ay HIWALAY na function, tulad ng hiling:
-
-     1) REALTIME TABLE (AJAX list + auto-refresh)
-     2) DATE RANGE FILTER (From / To + pag-e-enable ng Print btn)
-     3) PRINT BUTTON -> SweetAlert2 confirm -> PDF (dompdf) via
-        admin/pdf.php (bagong tab/window, dahil file view/download
-        ito, hindi JSON)
-
-   Data source: admin/control/print-control.php (JSON AJAX)
-   PDF source:  admin/pdf.php (dompdf, landscape)
-=========================================================== */
-
-// -----------------------------------------------------------
-// 0) GLOBAL CONFIG
 // -----------------------------------------------------------
 var PRINT_API_URL = '/ticketing/admin/control/print-control.php';
 var PRINT_PDF_URL = '/ticketing/admin/pdf.php';
@@ -47,14 +25,7 @@ function initPrintTab(container) {
 
 
   /* =============================================================
-     ============  1) REALTIME TABLE (AJAX + AUTO-REFRESH)  =======
-     -------------------------------------------------------------
-     Ito ang bahaging tumatawag sa print-control.php (action=list)
-     na siya namang tumatawag sa Ticket::getAllTickets() galing sa
-     ticket-function.php. Buong listahan ng ticket ang ipinapakita
-     dito (kasama ang status), hindi lang Resolved — ang Resolved
-     + date-range na filter ay para lang sa PDF (seksyon #3).
-  ============================================================== */
+     ============  1) REALTIME TABLE (AJAX + AUTO-REFRESH)  =======*/
 
   function statusBadgeClasses(status) {
     switch ((status || '').toLowerCase()) {
@@ -152,16 +123,7 @@ function initPrintTab(container) {
     }, PRINT_REFRESH_INTERVAL_MS);
   }
 
-
-  /* =============================================================
-     ============  2) DATE RANGE FILTER (From / To)  ==============
-     -------------------------------------------------------------
-     Ang mga <input type="date"> ay siya nang "column" na nagbubukas
-     ng native na calendar ng browser pag ni-click/focus (default
-     na behavior ng type="date", walang kailangan pang external
-     na date-picker library). Pag napili na ang parehong From at
-     To, saka lang mag-e-enable (green) ang Print button.
-  ============================================================== */
+ /* ============================================================== */
 
   function isFilterComplete() {
     return !!(dateFromEl && dateToEl && dateFromEl.value && dateToEl.value);
@@ -204,14 +166,6 @@ function initPrintTab(container) {
 
   /* =============================================================
      ======  3) PRINT BUTTON -> SWEETALERT2 -> PDF (dompdf)  =======
-     -------------------------------------------------------------
-     Pag-click ng Print (naka-enable na dahil kumpleto na ang
-     From/To): magbubukas ng SweetAlert2 confirmation dialog na
-     may GREEN na "Print" button at RED na "Close" button. Pag
-     kinumpirma, bubuksan sa BAGONG TAB ang admin/pdf.php kasama
-     ang from/to bilang query string — doon gagawin ni dompdf ang
-     landscape PDF gamit ang Resolved tickets lang sa loob ng
-     napiling date range.
   ============================================================== */
 
   function handlePrintClick() {
@@ -224,8 +178,8 @@ function initPrintTab(container) {
       icon: 'question',
       title: 'Generate Print Report?',
       html:
-        'Mag-p-print ng <strong>Resolved</strong> tickets mula ' +
-        '<strong>' + from + '</strong> hanggang <strong>' + to + '</strong>.',
+        'Print <strong>Resolved</strong> tickets from ' +
+        '<strong>' + from + '</strong> to <strong>' + to + '</strong>.',
       showCancelButton: true,
       confirmButtonText: '<i class="fa-solid fa-print"></i> Print',
       cancelButtonText: '<i class="fa-solid fa-xmark"></i> Close',
