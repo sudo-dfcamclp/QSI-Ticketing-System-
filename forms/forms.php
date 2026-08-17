@@ -183,96 +183,96 @@
                                    transition-colors duration-150 motion-reduce:transition-none"
                         ></textarea>
                     </div>
+
                     <!-- Attachment -->
-<!-- Attachment -->
-<div class="mb-6">
-    <div class="flex items-baseline gap-2 mb-2.5">
-        <span class="font-mono text-[11px] text-pine font-semibold tracking-[0.04em]">05</span>
-        <span class="text-[13px] font-semibold text-ink">Attachment</span>
-        <span class="font-mono text-xs text-inkmuted ml-auto">optional</span>
-    </div>
+                    <div class="mb-6">
+                        <div class="flex items-baseline gap-2 mb-2.5">
+                            <span class="font-mono text-[11px] text-pine font-semibold tracking-[0.04em]">05</span>
+                            <span class="text-[13px] font-semibold text-ink">Attachment</span>
+                            <span class="font-mono text-xs text-inkmuted ml-auto">optional</span>
+                        </div>
 
-    <div
-        id="attachmentArea"
-        tabindex="0"
-        class="relative border-[1.5px] border-dashed border-hairline rounded-lg
-               bg-[#FBFCFB] px-3 py-3 text-center cursor-pointer
-               hover:border-pine hover:bg-pinetint
-               focus:border-pine focus:bg-pinetint
-               transition-colors duration-150"
-    >
+                        <div
+                            id="attachmentArea"
+                            tabindex="0"
+                            class="relative border-[1.5px] border-dashed border-hairline rounded-lg
+                                   bg-[#FBFCFB] px-3 py-3 text-center cursor-pointer
+                                   hover:border-pine hover:bg-pinetint
+                                   focus:border-pine focus:bg-pinetint
+                                   transition-colors duration-150"
+                        >
 
-        <input
-            type="file"
-            name="attachment"
-            id="attachment"
-            class="hidden"
-            accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
-        >
+                            <input
+                                type="file"
+                                name="attachment"
+                                id="attachment"
+                                class="hidden"
+                                accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx"
+                            >
 
-        <div id="attachmentEmpty" class="flex items-center justify-center gap-2.5">
-            <div class="w-8 h-8 rounded-lg bg-pinetint
-                        flex items-center justify-center shrink-0">
-                <i class="fa-solid fa-paperclip text-pine text-xs"></i>
-            </div>
+                            <div id="attachmentEmpty" class="flex items-center justify-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-pinetint
+                                            flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-paperclip text-pine text-xs"></i>
+                                </div>
 
-            <div class="text-left">
-                <p class="text-xs font-semibold text-ink">
-                    Add attachment
-                </p>
+                                <div class="text-left">
+                                    <p class="text-xs font-semibold text-ink">
+                                        Add attachment
+                                    </p>
 
-                <p class="text-[10px] text-inkmuted">
-                    Click to browse or Ctrl+V to paste
-                </p>
-            </div>
-        </div>
+                                    <p class="text-[10px] text-inkmuted">
+                                        Click to browse or Ctrl+V to paste
+                                    </p>
+                                </div>
+                            </div>
 
-        <!-- Preview -->
-        <div id="attachmentPreview" class="hidden">
-            <div class="flex items-center gap-2 text-left">
+                            <!-- Preview -->
+                            <div id="attachmentPreview" class="hidden">
+                                <div class="flex items-center gap-2 text-left">
 
-                <div id="attachmentIcon"
-                     class="w-8 h-8 rounded-lg bg-pinetint
-                            flex items-center justify-center shrink-0">
-                    <i class="fa-solid fa-file text-pine text-xs"></i>
-                </div>
+                                    <div id="attachmentIcon"
+                                         class="w-8 h-8 rounded-lg bg-pinetint
+                                                flex items-center justify-center shrink-0">
+                                        <i class="fa-solid fa-file text-pine text-xs"></i>
+                                    </div>
 
-                <div class="min-w-0 flex-1">
-                    <p id="attachmentName"
-                       class="text-xs font-semibold text-ink truncate">
-                    </p>
+                                    <div class="min-w-0 flex-1">
+                                        <p id="attachmentName"
+                                           class="text-xs font-semibold text-ink truncate">
+                                        </p>
 
-                    <p id="attachmentSize"
-                       class="text-[10px] text-inkmuted">
-                    </p>
-                </div>
+                                        <p id="attachmentSize"
+                                           class="text-[10px] text-inkmuted">
+                                        </p>
+                                    </div>
 
-                <button
-                    type="button"
-                    id="removeAttachment"
-                    class="w-7 h-7 rounded-md text-inkmuted
-                           hover:text-red-600 hover:bg-red-50
-                           flex items-center justify-center"
-                    title="Remove attachment"
-                >
-                    <i class="fa-solid fa-xmark text-xs"></i>
-                </button>
+                                    <button
+                                        type="button"
+                                        id="removeAttachment"
+                                        class="w-7 h-7 rounded-md text-inkmuted
+                                               hover:text-red-600 hover:bg-red-50
+                                               flex items-center justify-center"
+                                        title="Remove attachment"
+                                    >
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </button>
 
-            </div>
+                                </div>
 
-            <div id="imagePreviewWrapper" class="hidden mt-2">
-                <img
-                    id="imagePreview"
-                    src=""
-                    alt="Attachment preview"
-                    class="max-h-40 max-w-full mx-auto rounded-md
-                           border border-hairline object-contain"
-                >
-            </div>
-        </div>
+                                <div id="imagePreviewWrapper" class="hidden mt-2">
+                                    <img
+                                        id="imagePreview"
+                                        src=""
+                                        alt="Attachment preview"
+                                        class="max-h-40 max-w-full mx-auto rounded-md
+                                               border border-hairline object-contain"
+                                    >
+                                </div>
+                            </div>
 
-    </div>
-</div>
+                        </div>
+                    </div>
                 </div>
 
                 <button

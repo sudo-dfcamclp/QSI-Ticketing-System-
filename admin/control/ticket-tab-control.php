@@ -286,12 +286,22 @@ try {
         case 'submit_response': {
             $ticketId = (int) ($input['ticket_id'] ?? 0);
             $message  = trim((string) ($input['message'] ?? ''));
+            $priority = trim((string) ($input['priority'] ?? ''));
 
             if ($ticketId <= 0 || $message === '') {
                 respond(['success' => false, 'message' => 'Missing ticket id or message.'], 400);
             }
 
-            $ok = $ticketModel->resolveTicket($ticketId, $message);
+            // Priority dropdown (Low/High/Critical) sa tabi ng
+            // "Response" label — whitelist para safe, kung
+            // invalid/wala lang, hindi ito babaguhin.
+            $allowedPriorities = ['Low', 'High', 'Critical'];
+
+            if (!in_array($priority, $allowedPriorities, true)) {
+                $priority = null;
+            }
+
+            $ok = $ticketModel->resolveTicket($ticketId, $message, $priority);
 
             if (!$ok) {
                 respond(['success' => false, 'message' => 'Failed to submit response.'], 500);

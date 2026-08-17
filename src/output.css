@@ -3000,6 +3000,18 @@ video {
   padding-top: 26px;
 }
 
+.pr-8 {
+  padding-right: 2rem;
+}
+
+.pl-2\.5 {
+  padding-left: 0.625rem;
+}
+
+.pr-6 {
+  padding-right: 1.5rem;
+}
+
 .text-left {
   text-align: left;
 }
@@ -4266,6 +4278,10 @@ video {
   border-color: rgb(14 91 69 / var(--tw-border-opacity, 1));
 }
 
+.focus\:border-transparent:focus {
+  border-color: transparent;
+}
+
 .focus\:bg-pinetint:focus {
   --tw-bg-opacity: 1;
   background-color: rgb(231 240 235 / var(--tw-bg-opacity, 1));
@@ -4291,6 +4307,11 @@ video {
   --tw-shadow: 0 0 0 4px rgba(14,91,69,0.12);
   --tw-shadow-colored: 0 0 0 4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
 .focus\:ring-2:focus {

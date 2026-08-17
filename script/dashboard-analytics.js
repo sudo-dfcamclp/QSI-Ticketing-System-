@@ -1,323 +1,702 @@
-document.addEventListener('DOMContentLoaded', () => {
+// =========================================================
+// DASHBOARD ANALYTICS
+// ---------------------------------------------------------
+// Chart.js initialization and UI updates
+// =========================================================
 
-    // =========================================================
-    // DASHBOARD SAMPLE DATA
-    // =========================================================
+let ticketLineChart = null;
+let departmentPieChart = null;
+let ticketBarChart = null;
 
-    const dashboardData = {
+// =========================================================
+// DYNAMIC COLOR GENERATOR
+// =========================================================
 
-        totalTickets: 248,
-        pendingTickets: 42,
-        totalAdminUsers: 8,
+function generateChartColors(count) {
 
-        priority: {
-            high: 54,
-            low: 86,
-            critical: 18
-        },
+    const colors = [];
 
-        departments: {
-            Accounting: 32,
-            'Human Resource': 45,
-            Admin: 28,
-            Executive: 18,
-            Remote: 64,
-            External: 61
-        },
+    for (let i = 0; i < count; i++) {
 
-        peripherals: {
-            'PC / Laptop': 82,
-            Internet: 56,
-            Printer: 39,
-            Scanner: 21,
-            Server: 18,
-            Others: 32
-        },
+        const hue = Math.round(
+            (360 / Math.max(count, 1)) * i
+        );
 
-        ticketActivity: {
-            labels: [
-                'Mon',
-                'Tue',
-                'Wed',
-                'Thu',
-                'Fri',
-                'Sat',
-                'Sun'
-            ],
-
-            values: [
-                28,
-                42,
-                35,
-                51,
-                44,
-                29,
-                39
-            ]
-        }
-    };
-
-
-    // =========================================================
-    // UPDATE SUMMARY CARDS
-    // =========================================================
-
-    const totalTickets = document.getElementById('totalTickets');
-    const pendingTickets = document.getElementById('pendingTickets');
-    const totalAdminUsers = document.getElementById('totalAdminUsers');
-    const highPriority = document.getElementById('highPriority');
-    const lowPriority = document.getElementById('lowPriority');
-    const criticalPriority = document.getElementById('criticalPriority');
-
-    if (totalTickets) {
-        totalTickets.textContent = dashboardData.totalTickets;
+        colors.push(
+            `hsl(${hue}, 70%, 55%)`
+        );
     }
 
-    if (pendingTickets) {
-        pendingTickets.textContent = dashboardData.pendingTickets;
+    return colors;
+}
+
+// =========================================================
+// COMMON CHART SETTINGS
+// =========================================================
+
+const modernChartAnimation = {
+    duration: 700,
+    easing: 'easeOutQuart'
+};
+
+const modernTooltip = {
+    enabled: true,
+    backgroundColor: 'rgba(17, 24, 39, 0.94)',
+    titleColor: '#ffffff',
+    bodyColor: '#e5e7eb',
+    borderWidth: 0,
+    cornerRadius: 10,
+    padding: 12,
+    displayColors: false,
+
+    titleFont: {
+        size: 13,
+        weight: '600'
+    },
+
+    bodyFont: {
+        size: 13,
+        weight: '500'
     }
+};
 
-    if (totalAdminUsers) {
-        totalAdminUsers.textContent = dashboardData.totalAdminUsers;
-    }
+// =========================================================
+// INITIALIZE DASHBOARD CHARTS
+// =========================================================
 
-    if (highPriority) {
-        highPriority.textContent = dashboardData.priority.high;
-    }
-
-    if (lowPriority) {
-        lowPriority.textContent = dashboardData.priority.low;
-    }
-
-    if (criticalPriority) {
-        criticalPriority.textContent = dashboardData.priority.critical;
-    }
-
-
-    // =========================================================
-    // UPDATE PERIPHERAL COUNTS
-    // =========================================================
-
-    const peripheralElements = {
-        'pcLaptopCount': dashboardData.peripherals['PC / Laptop'],
-        'internetCount': dashboardData.peripherals.Internet,
-        'printerCount': dashboardData.peripherals.Printer,
-        'scannerCount': dashboardData.peripherals.Scanner,
-        'serverCount': dashboardData.peripherals.Server,
-        'othersCount': dashboardData.peripherals.Others
-    };
-
-    Object.entries(peripheralElements).forEach(([id, value]) => {
-
-        const element = document.getElementById(id);
-
-        if (element) {
-            element.textContent = value;
-        }
-
-    });
-
-
-    // =========================================================
-    // CHECK CHART.JS
-    // =========================================================
+function initDashboardCharts() {
 
     if (typeof Chart === 'undefined') {
 
-        console.error('Chart.js is not loaded.');
+        console.error(
+            'Chart.js is not loaded.'
+        );
 
         return;
     }
 
-
-    // =========================================================
-    // TICKET LINE CHART
-    // =========================================================
+    // =====================================================
+    // LINE CHART
+    // =====================================================
 
     const ticketLineCanvas =
-        document.getElementById('ticketLineChart');
+        document.getElementById(
+            'ticketLineChart'
+        );
 
     if (ticketLineCanvas) {
 
-        new Chart(ticketLineCanvas, {
+        ticketLineChart = new Chart(
+            ticketLineCanvas,
+            {
+                type: 'line',
 
-            type: 'line',
+                data: {
 
-            data: {
-                labels: dashboardData.ticketActivity.labels,
+                    labels: [],
 
-                datasets: [{
-                    label: 'Tickets',
-
-                    data: dashboardData.ticketActivity.values,
-
-                    borderWidth: 3,
-
-                    tension: 0.4,
-
-                    fill: true,
-
-                    pointRadius: 4,
-
-                    pointHoverRadius: 6
-                }]
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-                    legend: {
-                        display: false
-                    }
+                    datasets: []
                 },
 
-                scales: {
+                options: {
 
-                    y: {
-                        beginAtZero: true,
+                    responsive: true,
 
-                        ticks: {
-                            precision: 0
-                        }
+                    maintainAspectRatio: false,
+
+                    animation:
+                        modernChartAnimation,
+
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
                     },
 
-                    x: {
-                        grid: {
-                            display: false
+                    hover: {
+                        mode: 'index',
+                        intersect: false
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            display: true,
+
+                            position: 'bottom',
+
+                            labels: {
+
+                                usePointStyle: true,
+
+                                pointStyle: 'circle',
+
+                                padding: 14,
+
+                                color: '#4b5563',
+
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        },
+
+                        tooltip:
+                            modernTooltip
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            border: {
+                                display: false
+                            },
+
+                            grid: {
+
+                                color:
+                                    'rgba(156, 163, 175, 0.12)',
+
+                                drawTicks: false
+                            },
+
+                            ticks: {
+
+                                precision: 0,
+
+                                padding: 10,
+
+                                color: '#6b7280'
+                            }
+                        },
+
+                        x: {
+
+                            border: {
+                                display: false
+                            },
+
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+
+                                padding: 10,
+
+                                color: '#6b7280'
+                            }
                         }
                     }
                 }
             }
-
-        });
-
+        );
     }
 
-
-    // =========================================================
-    // DEPARTMENT PIE CHART
-    // =========================================================
+    // =====================================================
+    // PIE CHART
+    // =====================================================
 
     const departmentPieCanvas =
-        document.getElementById('departmentPieChart');
+        document.getElementById(
+            'departmentPieChart'
+        );
 
     if (departmentPieCanvas) {
 
-        new Chart(departmentPieCanvas, {
+        departmentPieChart = new Chart(
+            departmentPieCanvas,
+            {
+                type: 'pie',
 
-            type: 'pie',
+                data: {
 
-            data: {
+                    labels: [],
 
-                labels: Object.keys(
-                    dashboardData.departments
-                ),
+                    datasets: [{
 
-                datasets: [{
+                        data: [],
 
-                    data: Object.values(
-                        dashboardData.departments
-                    ),
+                        borderWidth: 3,
 
-                    borderWidth: 2
-                }]
-            },
+                        borderColor: '#ffffff',
 
-            options: {
+                        hoverBorderWidth: 3,
 
-                responsive: true,
+                        hoverOffset: 4,
 
-                maintainAspectRatio: false,
+                        spacing: 1
+                    }]
+                },
 
-                plugins: {
+                options: {
 
-                    legend: {
-                        position: 'right'
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    animation:
+                        modernChartAnimation,
+
+                    interaction: {
+
+                        mode: 'nearest',
+
+                        intersect: true
+                    },
+
+                    plugins: {
+
+                        legend: {
+
+                            position: 'right',
+
+                            labels: {
+
+                                usePointStyle: true,
+
+                                pointStyle: 'circle',
+
+                                padding: 16,
+
+                                color: '#4b5563',
+
+                                font: {
+                                    size: 12,
+                                    weight: '500'
+                                }
+                            }
+                        },
+
+                        tooltip: {
+
+                            ...modernTooltip,
+
+                            displayColors: true,
+
+                            callbacks: {
+
+                                label:
+                                    function(context) {
+
+                                        const value =
+                                            context.raw ?? 0;
+
+                                        return `${value} tickets`;
+                                    }
+                            }
+                        }
                     }
                 }
             }
-
-        });
-
+        );
     }
 
-
-    // =========================================================
-    // PRIORITY BAR CHART
-    // =========================================================
+    // =====================================================
+    // BAR CHART
+    // =====================================================
 
     const ticketBarCanvas =
-    document.getElementById('ticketBarChart');
+        document.getElementById(
+            'ticketBarChart'
+        );
 
     if (ticketBarCanvas) {
 
-    new Chart(ticketBarCanvas, {
+        ticketBarChart = new Chart(
+            ticketBarCanvas,
+            {
+                type: 'bar',
 
-            type: 'bar',
+                data: {
 
-            data: {
-
-                labels: [
-                    'Critical',
-                    'High',
-                    'Low'
-                ],
-
-                datasets: [{
-
-                    label: 'Tickets',
-
-                    data: [
-                        dashboardData.priority.critical,
-                        dashboardData.priority.high,
-                        dashboardData.priority.low
+                    labels: [
+                        'Critical',
+                        'High',
+                        'Low'
                     ],
 
-                    borderWidth: 1,
+                    datasets: [{
 
-                    borderRadius: 8
-                }]
-            },
+                        label: 'Tickets',
 
-            options: {
+                        data: [
+                            0,
+                            0,
+                            0
+                        ],
 
-                responsive: true,
+                        borderWidth: 0,
 
-                maintainAspectRatio: false,
+                        borderRadius: 10,
 
-                plugins: {
+                        borderSkipped: false,
 
-                    legend: {
-                        display: false
-                    }
+                        backgroundColor: [
+
+                            'rgba(239, 68, 68, 0.85)',
+
+                            'rgba(245, 158, 11, 0.85)',
+
+                            'rgba(59, 130, 246, 0.85)'
+                        ],
+
+                        hoverBackgroundColor: [
+
+                            'rgb(220, 38, 38)',
+
+                            'rgb(217, 119, 6)',
+
+                            'rgb(37, 99, 235)'
+                        ],
+
+                        barPercentage: 0.55,
+
+                        categoryPercentage: 0.65
+                    }]
                 },
 
-                scales: {
+                options: {
 
-                    y: {
+                    responsive: true,
 
-                        beginAtZero: true,
+                    maintainAspectRatio: false,
 
-                        ticks: {
-                            precision: 0
+                    animation:
+                        modernChartAnimation,
+
+                    interaction: {
+
+                        mode: 'index',
+
+                        intersect: false
+                    },
+
+                    plugins: {
+
+                        legend: {
+                            display: false
+                        },
+
+                        tooltip: {
+
+                            ...modernTooltip,
+
+                            callbacks: {
+
+                                label:
+                                    function(context) {
+
+                                        return `${context.raw} tickets`;
+                                    }
+                            }
                         }
                     },
 
-                    x: {
+                    scales: {
 
-                        grid: {
-                            display: false
+                        y: {
+
+                            beginAtZero: true,
+
+                            border: {
+                                display: false
+                            },
+
+                            grid: {
+
+                                color:
+                                    'rgba(156, 163, 175, 0.12)',
+
+                                drawTicks: false
+                            },
+
+                            ticks: {
+
+                                precision: 0,
+
+                                padding: 10,
+
+                                color: '#6b7280'
+                            }
+                        },
+
+                        x: {
+
+                            border: {
+                                display: false
+                            },
+
+                            grid: {
+                                display: false
+                            },
+
+                            ticks: {
+
+                                color: '#6b7280',
+
+                                padding: 10
+                            }
                         }
                     }
                 }
             }
+        );
+    }
+}
 
-        });
+// =========================================================
+// UPDATE DASHBOARD UI
+// =========================================================
 
+function updateDashboardUI(data) {
+
+    if (!data) {
+        return;
     }
 
-});
+    // =====================================================
+    // SUMMARY CARDS
+    // =====================================================
+
+    setText(
+        'totalTickets',
+        data.totalTickets
+    );
+
+    setText(
+        'totalActive',
+        data.totalActive
+    );
+
+    setText(
+        'pendingTickets',
+        data.pendingTickets
+    );
+
+    setText(
+        'totalAdminUsers',
+        data.totalAdminUsers
+    );
+
+    setText(
+        'highPriority',
+        data.priority?.high
+    );
+
+    setText(
+        'lowPriority',
+        data.priority?.low
+    );
+
+    setText(
+        'criticalTickets',
+        data.priority?.critical
+    );
+
+    // =====================================================
+    // PERIPHERALS
+    // =====================================================
+
+    const peripherals =
+        data.peripherals || {};
+
+    const peripheralElements = {
+
+        pcLaptopCount:
+            peripherals['PC / Laptop'],
+
+        internetCount:
+            peripherals.Internet,
+
+        printerCount:
+            peripherals.Printer,
+
+        scannerCount:
+            peripherals.Scanner,
+
+        serverCount:
+            peripherals.Server,
+
+        othersCount:
+            peripherals.Others
+    };
+
+    let peripheralsTotal = 0;
+
+    Object.entries(
+        peripheralElements
+    ).forEach(([id, value]) => {
+
+        setText(
+            id,
+            value
+        );
+
+        peripheralsTotal +=
+            Number(value) || 0;
+    });
+
+    setText(
+        'peripheralsCount',
+        peripheralsTotal
+    );
+
+    // =====================================================
+    // LINE CHART
+    // =====================================================
+
+    if (
+        ticketLineChart &&
+        data.ticketActivity
+    ) {
+
+        const labels =
+            data.ticketActivity.labels || [];
+
+        const rawDatasets =
+            data.ticketActivity.datasets || [];
+
+        const colors =
+            generateChartColors(
+                rawDatasets.length
+            );
+
+        ticketLineChart.data.labels =
+            labels;
+
+        ticketLineChart.data.datasets =
+            rawDatasets.map(
+                (dataset, index) => ({
+
+                    label: dataset.label,
+
+                    data: dataset.data,
+
+                    borderWidth: 2.5,
+
+                    tension: 0.45,
+
+                    fill: false,
+
+                    pointRadius: 3,
+
+                    pointHoverRadius: 5,
+
+                    pointHitRadius: 12,
+
+                    pointBorderWidth: 2,
+
+                    pointHoverBorderWidth: 2,
+
+                    borderColor:
+                        colors[index],
+
+                    backgroundColor:
+                        colors[index],
+
+                    pointBackgroundColor:
+                        colors[index],
+
+                    pointBorderColor:
+                        '#ffffff',
+
+                    pointHoverBackgroundColor:
+                        colors[index],
+
+                    pointHoverBorderColor:
+                        '#ffffff'
+                })
+            );
+
+        ticketLineChart.update();
+    }
+
+    // =====================================================
+    // PIE CHART
+    // =====================================================
+
+    if (
+        departmentPieChart &&
+        data.departments
+    ) {
+
+        const labels =
+            Object.keys(
+                data.departments
+            );
+
+        departmentPieChart.data.labels =
+            labels;
+
+        departmentPieChart
+            .data
+            .datasets[0]
+            .data =
+            Object.values(
+                data.departments
+            );
+
+        departmentPieChart
+            .data
+            .datasets[0]
+            .backgroundColor =
+            generateChartColors(
+                labels.length
+            );
+
+        departmentPieChart.update();
+    }
+
+    // =====================================================
+    // BAR CHART
+    // =====================================================
+
+    if (
+        ticketBarChart &&
+        data.priorityBarChart
+    ) {
+
+        ticketBarChart.data.labels =
+            data.priorityBarChart.labels;
+
+        ticketBarChart
+            .data
+            .datasets[0]
+            .data =
+            data.priorityBarChart.values;
+
+        ticketBarChart.update();
+    }
+}
+
+// =========================================================
+// SET TEXT
+// =========================================================
+
+function setText(id, value) {
+
+    const element =
+        document.getElementById(id);
+
+    if (element) {
+
+        element.textContent =
+            value ?? 0;
+    }
+}
+
+// =========================================================
+// INITIALIZE
+// =========================================================
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initDashboardCharts();
+    }
+);

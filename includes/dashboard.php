@@ -68,18 +68,32 @@ require_once __DIR__ . '/auth/auth.php';
                                 <!-- RIGHT SIDE: WELCOME + PROFILE -->
                                 <div class="flex items-center gap-3 bg-gray-100 rounded-2xl px-4 py-2.5">
 
+                                    <?php
+                                        // Galing sa session, itinakda na ito ng login-control.php
+                                        // nung mag-login yung user ($_SESSION['f_name'] / ['l_name']).
+                                        $firstName = trim($_SESSION['f_name'] ?? '');
+                                        $lastName  = trim($_SESSION['l_name'] ?? '');
+
+                                        $displayName = $firstName !== '' ? $firstName : 'User';
+
+                                        $initials = strtoupper(
+                                            ($firstName !== '' ? $firstName[0] : 'U') .
+                                            ($lastName !== '' ? $lastName[0] : '')
+                                        );
+                                    ?>
+
                                     <!-- WELCOME + NAME -->
                                     <div class="text-right">
-                                        <p class="text-sm text-gray-500">
+                                        <p class="text-xl text-gray-500">
                                             Welcome
                                         </p>
 
                                         <p class="text-2xl font-semibold text-gray-800">
-                                            Andrew
+                                            <?php echo htmlspecialchars($displayName, ENT_QUOTES, 'UTF-8'); ?>
                                         </p>
                                     </div>
                                     <!-- PROFILE CIRCLE -->
-                                    <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center font-semibold text-sm">AN</div>
+                                    <div class="w-16 h-16 rounded-full bg-green-600 text-white flex items-center justify-center font-semibold text-sm"><?php echo htmlspecialchars($initials, ENT_QUOTES, 'UTF-8'); ?></div>
 
                                 </div>
 
@@ -199,9 +213,20 @@ require_once __DIR__ . '/auth/auth.php';
                                     <div class="flex items-center justify-between mb-6">
                                         <div>
                                             <h3 class="text-lg font-semibold text-gray-800">Ticket Overview</h3>
-                                            <p class="text-sm text-gray-500 mt-1">Ticket activity over time</p>
+                                            <p class="text-sm text-gray-500 mt-1">Ticket activity per department</p>
                                         </div>
-                                        <i class="fa-solid fa-chart-line text-green-600 text-xl"></i>
+
+                                        <div class="flex items-center gap-3">
+                                            <select
+                                                id="ticketRangeSelect"
+                                                class="text-sm font-medium text-gray-600 bg-gray-50 border border-gray-200 rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer">
+                                                <option value="week" selected>Week</option>
+                                                <option value="month">Month</option>
+                                                <option value="year">Year</option>
+                                            </select>
+
+                                            <i class="fa-solid fa-chart-line text-green-600 text-xl"></i>
+                                        </div>
                                     </div>
 
                                     <div class="relative h-80">
@@ -307,6 +332,7 @@ require_once __DIR__ . '/auth/auth.php';
 
     <script src="/ticketing/script/sidebar.js"></script>
     <script src="/ticketing/script/tab-manager.js"></script>
+    <script src="/ticketing/script/dashboard.js"></script>
     <script src="/ticketing/script/dashboard-analytics.js"></script>
 
 </body>

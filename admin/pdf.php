@@ -1,33 +1,10 @@
 <?php
-
-/* =============================================================
-   PDF.PHP — Landscape PDF Report ng Resolved Tickets (dompdf)
-   -------------------------------------------------------------
-   Binubuksan ito sa BAGONG TAB (window.open) galing sa Print
-   button ng admin/print.php (see admin/script/print.js). Hindi
-   ito AJAX/JSON endpoint — direktang nagbabalik ito ng PDF file
-   (binary stream) papunta sa browser.
-
-   Query string na kailangan:
-     ?from=YYYY-MM-DD&to=YYYY-MM-DD
-
-   Ang datos ay galing sa Ticket::getResolvedTicketsByDateRange()
-   (includes/functions/ticket-function.php) — "Resolved" status
-   LANG, base sa resolve_at column, sa loob ng napiling range.
-
-   Tingnan ang DOMPDF INSTALLATION GUIDE sa chat/summary para sa
-   paano i-install ang dompdf/dompdf gamit ang Composer.
-============================================================== */
-
 declare(strict_types=1);
 
-// -----------------------------------------------------------
-// 1) SESSION CHECK
-//    Parehong session name gaya ng ibang bahagi ng Ticketing
-//    system, para hindi ma-access ang report kung hindi naka-
-//    login. Redirect papunta sa login (hindi JSON) kasi direct
-//    na browser navigation ito (window.open), hindi fetch/AJAX.
-// -----------------------------------------------------------
+/* =========================================================
+   SESSION
+========================================================== */
+
 session_name('ticketing_session');
 session_start();
 
@@ -36,34 +13,46 @@ if (!isset($_SESSION['user_id'])) {
     exit('Unauthorized. Please log in again.');
 }
 
+/* =========================================================
+   LOAD TICKET MODEL
+========================================================== */
+
 require_once __DIR__ . '/../includes/functions/ticket-function.php';
 
-// -----------------------------------------------------------
-// 2) LOAD DOMPDF
-//    Kinukuha via Composer autoload. I-run ang:
-//      composer require dompdf/dompdf
-//    sa root ng project (kung saan ilalagay ang composer.json),
-//    tapos titiyakin na ang vendor/autoload.php ay tama ang
-//    landas papunta rito. (Tingnan ang guide sa summary.)
-// -----------------------------------------------------------
+/* =========================================================
+   LOAD DOMPDF
+========================================================== */
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
-// -----------------------------------------------------------
-// 3) VALIDATE FILTER (From / To)
-// -----------------------------------------------------------
+/* =========================================================
+   VALIDATE DATE
+========================================================== */
+
 function isValidDate(string $date): bool
 {
     $d = DateTime::createFromFormat('Y-m-d', $date);
+
     return $d && $d->format('Y-m-d') === $date;
 }
 
-$from = trim((string) ($_GET['from'] ?? ''));
-$to   = trim((string) ($_GET['to'] ?? ''));
+/* =========================================================
+   GET FILTER VALUES
+========================================================== */
 
-if ($from === '' || $to === '' || !isValidDate($from) || !isValidDate($to)) {
+$from = trim((string) ($_GET['from'] ?? ''));
+$to = trim((string) ($_GET['to'] ?? ''));
+$sort = trim((string) ($_GET['sort'] ?? 'latest'));
+
+if (
+    $from === '' ||
+    $to === '' ||
+    !isValidDate($from) ||
+    !isValidDate($to)
+) {
     http_response_code(400);
     exit('Invalid or missing "from"/"to" date. Format: YYYY-MM-DD');
 }
@@ -73,36 +62,65 @@ if ($from > $to) {
     exit('"from" date cannot be later than "to" date.');
 }
 
-// -----------------------------------------------------------
-// 4) FETCH DATA — Resolved tickets lang, sa loob ng date range
-// -----------------------------------------------------------
-$ticketModel = new Ticket($db);
-$tickets     = $ticketModel->getResolvedTicketsByDateRange($from, $to);
+if (!in_array($sort, ['oldest', 'latest'], true)) {
+    $sort = 'latest';
+}
 
-// -----------------------------------------------------------
-// 5) HELPERS (escaping + date formatting para sa HTML ng PDF)
-// -----------------------------------------------------------
+/* =========================================================
+   FETCH RESOLVED TICKETS
+========================================================== */
+
+$ticketModel = new Ticket($db);
+
+$tickets = $ticketModel->getResolvedTicketsByDateRange(
+    $from,
+    $to,
+    $sort
+);
+
+/* =========================================================
+   HTML ESCAPE
+========================================================== */
+
 function h(?string $value): string
 {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        'UTF-8'
+    );
 }
+
+/* =========================================================
+   FORMAT DATE TIME
+========================================================== */
 
 function fmt(?string $value): string
 {
-    if (!$value) return '—';
-    $d = DateTime::createFromFormat('Y-m-d H:i:s', $value) ?: (new DateTime($value));
+    if (!$value) {
+        return '—';
+    }
+
+    $d = DateTime::createFromFormat(
+        'Y-m-d H:i:s',
+        $value
+    ) ?: new DateTime($value);
+
     return $d->format('M d, Y g:i A');
 }
 
-// -----------------------------------------------------------
-// 5b) LOGO — i-embed bilang base64 (data URI)
-//     -------------------------------------------------------
-//     Ginagawa itong base64 (hindi direktang <img src="path">
-//     o URL) dahil naka-off ang isRemoteEnabled para sa
-//     seguridad, kaya hindi rin siya makaka-fetch ng file sa
-//     labas ng script. Embedded base64 ang pinaka-sigurado at
-//     mabilis na paraan para dumisplay ang logo sa PDF.
-// -----------------------------------------------------------
+/* =========================================================
+   SORT LABEL
+========================================================== */
+
+$sortLabel = $sort === 'oldest'
+    ? 'Oldest to Latest'
+    : 'Latest to Oldest';
+
+/* =========================================================
+   LOGO
+========================================================== */
+
 function getLogoDataUri(): string
 {
     $logoPath = __DIR__ . '/../assets/logo/logo2.png';
@@ -118,17 +136,25 @@ function getLogoDataUri(): string
 }
 
 $logoDataUri = getLogoDataUri();
-$logoImgTag  = $logoDataUri !== ''
+
+$logoImgTag = $logoDataUri !== ''
     ? '<img src="' . $logoDataUri . '" class="logo">'
     : '';
 
-// -----------------------------------------------------------
-// 6) BUILD THE TABLE ROWS (HTML na ipapakain kay dompdf)
-// -----------------------------------------------------------
+/* =========================================================
+   BUILD TABLE ROWS
+========================================================== */
+
 $rowsHtml = '';
 
 if (empty($tickets)) {
-    $rowsHtml = '<tr><td colspan="10" class="empty">No resolved tickets found for the selected date range.</td></tr>';
+    $rowsHtml = '
+        <tr>
+            <td colspan="10" class="empty">
+                No resolved tickets found for the selected date range.
+            </td>
+        </tr>
+    ';
 } else {
     foreach ($tickets as $t) {
         $rowsHtml .=
@@ -147,12 +173,15 @@ if (empty($tickets)) {
     }
 }
 
-// -----------------------------------------------------------
-// 7) FULL HTML DOCUMENT (dompdf renders plain HTML/CSS — walang
-//    Tailwind classes dito dahil walang browser/CDN si dompdf;
-//    plain inline <style> lang ang gagana)
-// -----------------------------------------------------------
+/* =========================================================
+   GENERATED DATE
+========================================================== */
+
 $generatedAt = (new DateTime())->format('M d, Y g:i A');
+
+/* =========================================================
+   PDF HTML
+========================================================== */
 
 $html = <<<HTML
 <!DOCTYPE html>
@@ -160,7 +189,9 @@ $html = <<<HTML
 <head>
 <meta charset="utf-8">
 <style>
-    @page { margin: 20px 24px; }
+    @page {
+        margin: 20px 24px;
+    }
 
     body {
         font-family: 'DejaVu Sans', sans-serif;
@@ -171,7 +202,7 @@ $html = <<<HTML
     .header {
         margin-bottom: 14px;
         width: 100%;
-        overflow: hidden; /* para gumana ang float layout sa dompdf */
+        overflow: hidden;
     }
 
     .header .logo {
@@ -183,7 +214,7 @@ $html = <<<HTML
     }
 
     .header .header-text {
-        overflow: hidden; /* natural na "flex" effect gamit ang float+overflow, dahil limited ang flexbox support ng dompdf */
+        overflow: hidden;
         padding-top: 4px;
     }
 
@@ -240,18 +271,29 @@ $html = <<<HTML
     }
 </style>
 </head>
+
 <body>
 
     <div class="header">
         {$logoImgTag}
+
         <div class="header-text">
             <h1>Ticket Report | Resolved Tickets</h1>
-            <p>Date Range: {$from} to {$to} &nbsp;|&nbsp; Generated: {$generatedAt}</p>
+
+            <p>
+                Date Range: {$from} to {$to}
+                &nbsp;|&nbsp;
+                Sort: {$sortLabel}
+                &nbsp;|&nbsp;
+                Generated: {$generatedAt}
+            </p>
         </div>
     </div>
 
     <table>
+
         <thead>
+
             <tr>
                 <th>Ticket ID</th>
                 <th>Status</th>
@@ -264,10 +306,13 @@ $html = <<<HTML
                 <th>Ticket At</th>
                 <th>Resolve At</th>
             </tr>
+
         </thead>
+
         <tbody>
             {$rowsHtml}
         </tbody>
+
     </table>
 
     <div class="footer">
@@ -278,17 +323,54 @@ $html = <<<HTML
 </html>
 HTML;
 
-// -----------------------------------------------------------
-// 8) RENDER WITH DOMPDF — LANDSCAPE
-// -----------------------------------------------------------
+/* =========================================================
+   DOMPDF
+========================================================== */
+
 $options = new Options();
-$options->set('isHtml5ParserEnabled', true);
-$options->set('isRemoteEnabled', false);
-$options->set('defaultFont', 'DejaVu Sans');
+
+$options->set(
+    'isHtml5ParserEnabled',
+    true
+);
+
+$options->set(
+    'isRemoteEnabled',
+    false
+);
+
+$options->set(
+    'defaultFont',
+    'DejaVu Sans'
+);
 
 $dompdf = new Dompdf($options);
+
 $dompdf->loadHtml($html);
-$dompdf->setPaper('A4', 'landscape');
+
+$dompdf->setPaper(
+    'A4',
+    'landscape'
+);
+
 $dompdf->render();
-$filename = 'ticket-report_' . $from . '_to_' . $to . '.pdf';
-$dompdf->stream($filename, ['Attachment' => false]);
+
+/* =========================================================
+   PDF OUTPUT
+========================================================== */
+
+$filename =
+    'ticket-report_' .
+    $from .
+    '_to_' .
+    $to .
+    '_' .
+    $sort .
+    '.pdf';
+
+$dompdf->stream(
+    $filename,
+    [
+        'Attachment' => false
+    ]
+);

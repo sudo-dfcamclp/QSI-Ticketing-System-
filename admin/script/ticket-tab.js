@@ -22,6 +22,13 @@ var TICKET_PER_PAGE = 10;
 var TICKET_POLL_INTERVAL_MS = 5000; // 5 segundo bawat "realtime" check
 var TICKET_NOTIF_SOUND_URL = '/ticketing/assets/sounds/notif.mp3';
 
+// Base URL para sa mga naka-attach na file. Ang attachment column
+// sa DB ay naka-store bilang relative path (hal. "attachment/xxx.png"),
+// at dahil ang physical folder (C:\xampp\htdocs\ticketing\attachment)
+// ay nasa loob mismo ng htdocs\ticketing, direktang naa-access ito
+// sa browser sa pamamagitan ng "/ticketing/" + relative path.
+var TICKET_ATTACHMENT_BASE_URL = '/ticketing/';
+
 // -----------------------------------------------------------
 // NOTIFICATION PERMISSION — hingin ito NANG ISANG BESES sa
 // pagbukas ng Ticket Tab. Kailangan ito ng browser bago
@@ -103,11 +110,138 @@ function initTicketTab(container) {
 
 
   /* =============================================================
+     ATTACHMENT HELPERS
+     -------------------------------------------------------------
+     ticket.attachment ay relative path (hal. "attachment/foo.png")
+     o null/empty kung walang na-upload noong gumawa ng ticket.
+  ============================================================== */
+  var IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg'];
+
+  function attachmentFileName(path) {
+    if (!path) return '';
+    var parts = String(path).split(/[\\/]/);
+    return parts[parts.length - 1];
+  }
+
+  function attachmentExtension(path) {
+    var name = attachmentFileName(path);
+    var dot = name.lastIndexOf('.');
+    return dot === -1 ? '' : name.slice(dot + 1).toLowerCase();
+  }
+
+  function isImageAttachment(path) {
+    return IMAGE_EXTENSIONS.indexOf(attachmentExtension(path)) !== -1;
+  }
+
+  function attachmentIconClass(ext) {
+    if (ext === 'pdf') return 'fa-solid fa-file-pdf';
+    if (ext === 'doc' || ext === 'docx') return 'fa-solid fa-file-word';
+    if (ext === 'ppt' || ext === 'pptx') return 'fa-solid fa-file-powerpoint';
+    if (ext === 'xls' || ext === 'xlsx') return 'fa-solid fa-file-excel';
+    return 'fa-solid fa-file';
+  }
+
+  /* =============================================================
+     OPEN ATTACHMENT MODAL (SweetAlert2)
+     -------------------------------------------------------------
+     - PNG/JPG/JPEG -> malaking preview sa loob ng modal, may
+       click-to-zoom (scale 1x <-> 2.2x, may scroll kapag naka-zoom)
+     - Ibang file type (PDF, DOC/DOCX, PPT/PPTX, XLS/XLSX, atbp.)
+       -> file card na may icon + filename + "Open file" na link
+         (bubukas sa sariling tab, kasi hindi lahat ng file type
+         ay mape-preview inline sa browser)
+     - May "X" close button sa itaas-kanan (showCloseButton)
+  ============================================================== */
+  function openAttachmentModal(attachmentPath) {
+    if (typeof Swal === 'undefined') return;
+    if (!attachmentPath) {
+      Swal.fire({
+        icon: 'info',
+        title: 'No Attachment',
+        text: 'This ticket does not have an attached file.',
+        confirmButtonColor: '#0a5d3c'
+      });
+      return;
+    }
+
+    var fileUrl  = TICKET_ATTACHMENT_BASE_URL + String(attachmentPath).replace(/^\/+/, '');
+    var fileName = attachmentFileName(attachmentPath);
+    var ext      = attachmentExtension(attachmentPath);
+
+    if (isImageAttachment(attachmentPath)) {
+      Swal.fire({
+        title: escapeHtml(fileName),
+        html:
+          '<div class="attachment-zoom-wrap" style="max-height:70vh; overflow:auto; border-radius:12px; background:#F4F6F3; display:flex; align-items:center; justify-content:center; padding:10px;">' +
+            '<img id="ticketAttachmentZoomImg" src="' + escapeHtml(fileUrl) + '" alt="' + escapeHtml(fileName) + '" ' +
+              'style="max-width:100%; max-height:65vh; cursor:zoom-in; transition:transform 0.2s ease; transform-origin:center center; border-radius:8px;">' +
+          '</div>' +
+          '<p style="margin-top:10px; font-size:12px; color:#8a9a86; font-family:monospace; text-transform:uppercase; letter-spacing:0.05em;">Click image to zoom</p>',
+        showCloseButton: true,
+        showConfirmButton: false,
+        width: 'min(720px, 92vw)',
+        padding: '1.5rem',
+        didOpen: function () {
+          var img = document.getElementById('ticketAttachmentZoomImg');
+          var wrap = img ? img.closest('.attachment-zoom-wrap') : null;
+          var zoomed = false;
+
+          if (img) {
+            img.addEventListener('click', function () {
+              zoomed = !zoomed;
+              if (zoomed) {
+                img.style.transform = 'scale(2.2)';
+                img.style.cursor = 'zoom-out';
+                if (wrap) wrap.style.cursor = 'default';
+              } else {
+                img.style.transform = 'scale(1)';
+                img.style.cursor = 'zoom-in';
+              }
+            });
+          }
+        }
+      });
+      return;
+    }
+
+    // ---------- Non-image file (PDF, DOCX, PPTX, XLSX, atbp.) ----------
+    Swal.fire({
+      title: 'Attachment',
+      html:
+        '<div style="display:flex; flex-direction:column; align-items:center; gap:14px; padding:18px 0 6px;">' +
+          '<div style="width:64px; height:64px; border-radius:16px; background:#E7EFE8; color:#0a5d3c; display:flex; align-items:center; justify-content:center;">' +
+            '<i class="' + attachmentIconClass(ext) + '" style="font-size:26px;"></i>' +
+          '</div>' +
+          '<p style="font-size:14px; font-weight:600; color:#1c261e; word-break:break-all; max-width:320px; margin:0;">' + escapeHtml(fileName) + '</p>' +
+          '<a href="' + escapeHtml(fileUrl) + '" target="_blank" rel="noopener noreferrer" ' +
+            'style="display:inline-flex; align-items:center; gap:8px; background:#0a5d3c; color:#fff; font-size:13px; font-weight:600; padding:10px 18px; border-radius:10px; text-decoration:none;">' +
+            '<i class="fa-solid fa-arrow-up-right-from-square"></i> Open file' +
+          '</a>' +
+        '</div>',
+      showCloseButton: true,
+      showConfirmButton: false,
+      width: 380
+    });
+  }
+
+
+  /* =============================================================
      BUILD ONE TICKET ITEM (HTML string) — sinusunod ang parehong
      Tailwind structure/classes ng orinal na static markup mo.
   ============================================================== */
   function buildTicketItemHtml(ticket) {
     var s = statusStyles(ticket.status);
+
+    // I-normalize yung existing priority ng ticket papuntang isa
+    // sa 3 dropdown options (Low/High/Critical), para
+    // pre-selected agad sa panel kung meron nang laman.
+    var priorityForSelect = (function (raw) {
+      var normalized = String(raw || '').trim().toLowerCase();
+      if (normalized === 'low') return 'Low';
+      if (normalized === 'high') return 'High';
+      if (normalized === 'critical') return 'Critical';
+      return 'Low'; // default kung wala pang laman/hindi kilala
+    })(ticket.priority);
 
     var resolutionBlock = '';
     if (ticket.resolution) {
@@ -122,6 +256,11 @@ function initTicketTab(container) {
           '<p class="text-sm text-inkmuted leading-relaxed">' + escapeHtml(ticket.resolution) + '</p>' +
         '</div>';
     }
+
+    var hasAttachment = !!ticket.attachment;
+    var attachmentBtnClasses = hasAttachment
+      ? 'ticket-view-attachment-btn ml-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-canvas border border-hairline text-inkmuted text-[10px] font-semibold uppercase tracking-[0.05em] hover:bg-pinetint hover:text-pine hover:border-pine/30 transition-colors'
+      : 'ticket-view-attachment-btn ml-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-canvas border border-hairline text-inkmuted/50 text-[10px] font-semibold uppercase tracking-[0.05em] cursor-not-allowed opacity-60';
 
     return (
       '<div class="ticket-item rounded-xl border border-hairline overflow-hidden bg-surface hover:border-pine/40 hover:shadow-sm transition-all duration-200" data-ticket-id="' + escapeHtml(ticket.ticket_id) + '">' +
@@ -207,7 +346,14 @@ function initTicketTab(container) {
                   '<i class="fa-solid fa-reply text-xs"></i>' +
                 '</div>' +
                 '<p class="text-[10px] font-mono font-semibold uppercase tracking-[0.08em] text-inkmuted">Response</p>' +
-                '<button type="button" class="ml-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-canvas border border-hairline text-inkmuted text-[10px] font-semibold uppercase tracking-[0.05em] hover:bg-pinetint hover:text-pine hover:border-pine/30 transition-colors">' +
+
+                '<select class="ticket-priority-select ml-2 pl-2.5 pr-6 py-1.5 rounded-lg bg-canvas border border-hairline text-inkmuted text-[10px] font-semibold uppercase tracking-[0.05em] outline-none cursor-pointer hover:border-pine/30 focus:border-pine transition-colors">' +
+                  '<option value="Low"' + (priorityForSelect === 'Low' ? ' selected' : '') + '>Low</option>' +
+                  '<option value="High"' + (priorityForSelect === 'High' ? ' selected' : '') + '>High</option>' +
+                  '<option value="Critical"' + (priorityForSelect === 'Critical' ? ' selected' : '') + '>Critical</option>' +
+                '</select>' +
+
+                '<button type="button" class="' + attachmentBtnClasses + '" data-attachment="' + escapeHtml(ticket.attachment || '') + '"' + (hasAttachment ? '' : ' disabled') + '>' +
                   '<i class="fa-solid fa-paperclip text-xs"></i> View Attachment' +
                 '</button>' +
               '</div>' +
@@ -457,7 +603,7 @@ function initTicketTab(container) {
           n.close();
         };
       }
-    } else {
+      } else {
       // Tab mismo ang naka-focus — SweetAlert2 modal sa gitna.
       if (typeof Swal !== 'undefined') {
         Swal.fire({
@@ -471,9 +617,12 @@ function initTicketTab(container) {
           toast: false,
           position: 'center',
           showConfirmButton: true,
-          confirmButtonText: 'View Ticket',
-          timer: 6000,
-          timerProgressBar: true
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#16a34a',
+          timer: 120000,
+          timerProgressBar: true,
+          allowOutsideClick: false,
+          allowEscapeKey: true
         });
       }
     }
@@ -616,6 +765,19 @@ function initTicketTab(container) {
           '</div>')
         : '';
     }
+
+    // i-update yung "View Attachment" button (data-attachment +
+    // enabled/disabled state) — kasabay na-refresh ito bawat
+    // pagbukas ng panel, kaya laging tugma sa pinaka-bagong laman.
+    var attachmentBtn = ticketItem.querySelector('.ticket-view-attachment-btn');
+    if (attachmentBtn) {
+      var hasAttachment = !!ticket.attachment;
+      attachmentBtn.dataset.attachment = ticket.attachment || '';
+      attachmentBtn.disabled = !hasAttachment;
+      attachmentBtn.className = hasAttachment
+        ? 'ticket-view-attachment-btn ml-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-canvas border border-hairline text-inkmuted text-[10px] font-semibold uppercase tracking-[0.05em] hover:bg-pinetint hover:text-pine hover:border-pine/30 transition-colors'
+        : 'ticket-view-attachment-btn ml-2 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-canvas border border-hairline text-inkmuted/50 text-[10px] font-semibold uppercase tracking-[0.05em] cursor-not-allowed opacity-60';
+    }
   }
 
   function refreshTicketPanel(ticketItem, ticketId) {
@@ -693,6 +855,14 @@ function initTicketTab(container) {
       return;
     }
 
+    // ---------- View Attachment ----------
+    var attachmentBtn = e.target.closest('.ticket-view-attachment-btn');
+    if (attachmentBtn) {
+      if (attachmentBtn.disabled) return;
+      openAttachmentModal(attachmentBtn.dataset.attachment);
+      return;
+    }
+
     // ---------- Submit response ----------
     var submitBtn = e.target.closest('.ticket-submit-btn');
     if (submitBtn) {
@@ -701,14 +871,18 @@ function initTicketTab(container) {
       var textarea = ticketItem
         ? ticketItem.querySelector('.ticket-reply-input')
         : null;
+      var prioritySelect = ticketItem
+        ? ticketItem.querySelector('.ticket-priority-select')
+        : null;
       var message = textarea ? textarea.value.trim() : '';
+      var priority = prioritySelect ? prioritySelect.value : '';
 
       if (!message) {
         if (textarea) textarea.focus();
         return;
       }
 
-      submitTicketResponse(ticketId, message, submitBtn, textarea, ticketItem);
+      submitTicketResponse(ticketId, message, priority, submitBtn, textarea, ticketItem);
     }
   });
 
@@ -733,7 +907,7 @@ function initTicketTab(container) {
    * likod ay tumatawag sa Ticket::resolveTicket() mula sa
    * ticket-function.php.
    */
-  function submitTicketResponse(ticketId, message, submitBtn, textarea, ticketItem) {
+  function submitTicketResponse(ticketId, message, priority, submitBtn, textarea, ticketItem) {
     var originalHtml = submitBtn.innerHTML;
 
     submitBtn.disabled = true;
@@ -743,7 +917,8 @@ function initTicketTab(container) {
     apiPost({
       action: 'submit_response',
       ticket_id: ticketId,
-      message: message
+      message: message,
+      priority: priority
     })
       .then(function (data) {
         submitBtn.disabled = false;
