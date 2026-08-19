@@ -19,6 +19,10 @@ require_once __DIR__ . '/../../includes/functions/ticket-function.php';
 
 $ticketModel = new Ticket($db);
 
+// Max rows per page para sa Print Report (tugma sa TICKET_PER_PAGE
+// pattern ng ticket-tab, pero hiwalay na constant dito).
+const PRINT_PER_PAGE = 10;
+
 /* =========================================================
    JSON RESPONSE
 ========================================================== */
@@ -65,76 +69,286 @@ $input = getInput();
 $action = $input['action'] ?? ($_GET['action'] ?? '');
 
 try {
+
     switch ($action) {
 
         /* =====================================================
-           LIST
+           LIST — RESOLVED TICKETS ONLY
+           -----------------------------------------------------
+           Kunin lamang ang Resolved tickets para sa Print Report.
+           May pagination, maximum 10 tickets bawat page.
+
+           GET:
+           print-control.php?action=list&page=1
         ====================================================== */
 
         case 'list': {
+
+            $page = max(
+                1,
+                (int) ($input['page'] ?? 1)
+            );
+
+            $perPage = PRINT_PER_PAGE;
+
+            /*
+             * Kunin ang lahat ng tickets mula sa existing
+             * Ticket class.
+             */
             $allTickets = $ticketModel->getAllTickets();
 
+            /*
+             * IMPORTANT:
+             * Resolved tickets lamang ang papayagan sa Print tab.
+             *
+             * Hindi kasama:
+             * - Pending
+             * - Viewed
+             * - Open
+             *
+             * Resolved lamang.
+             */
+            $resolvedTickets = array_values(
+                array_filter(
+                    $allTickets,
+                    function ($ticket) {
+
+                        return strtolower(
+                            trim(
+                                $ticket['status'] ?? ''
+                            )
+                        ) === 'resolved';
+                    }
+                )
+            );
+
+            /*
+             * Kunin ang pinakamataas na ticket ID
+             * mula sa Resolved tickets.
+             */
             $maxId = 0;
 
-            foreach ($allTickets as $t) {
-                if ((int) $t['ticket_id'] > $maxId) {
-                    $maxId = (int) $t['ticket_id'];
+            foreach ($resolvedTickets as $ticket) {
+
+                if (
+                    (int) $ticket['ticket_id'] >
+                    $maxId
+                ) {
+                    $maxId =
+                        (int) $ticket['ticket_id'];
                 }
             }
 
+            /*
+             * Total Resolved tickets lamang.
+             */
+            $total = count(
+                $resolvedTickets
+            );
+
+            /*
+             * Calculate total pages.
+             */
+            $totalPages = (int) max(
+                1,
+                ceil(
+                    $total / $perPage
+                )
+            );
+
+            /*
+             * Prevent invalid page number.
+             */
+            $page = min(
+                $page,
+                $totalPages
+            );
+
+            /*
+             * Calculate offset.
+             */
+            $offset =
+                ($page - 1) *
+                $perPage;
+
+            /*
+             * Get current page items.
+             */
+            $pageItems = array_slice(
+                $resolvedTickets,
+                $offset,
+                $perPage
+            );
+
             respond([
-                'success' => true,
-                'data' => $allTickets,
-                'total' => count($allTickets),
-                'max_id' => $maxId
+                'success'     => true,
+                'data'        => $pageItems,
+                'total'       => $total,
+                'page'        => $page,
+                'per_page'    => $perPage,
+                'total_pages' => $totalPages,
+                'max_id'      => $maxId
             ]);
         }
 
         /* =====================================================
-           FILTER
+           FILTER — RESOLVED TICKETS BY DATE RANGE
+           -----------------------------------------------------
+           Resolved tickets lamang ang ibinabalik.
+           May pagination din, maximum 10 bawat page.
         ====================================================== */
 
         case 'filter': {
-            $from = trim((string) ($input['from'] ?? ''));
-            $to = trim((string) ($input['to'] ?? ''));
-            $sort = trim((string) ($input['sort'] ?? 'latest'));
 
-            if ($from === '' || $to === '') {
+            $from = trim(
+                (string) (
+                    $input['from'] ?? ''
+                )
+            );
+
+            $to = trim(
+                (string) (
+                    $input['to'] ?? ''
+                )
+            );
+
+            $sort = trim(
+                (string) (
+                    $input['sort'] ?? 'latest'
+                )
+            );
+
+            /*
+             * Required dates.
+             */
+            if (
+                $from === '' ||
+                $to === ''
+            ) {
+
                 respond([
                     'success' => false,
-                    'message' => 'Kailangan ng From at To date.'
+                    'message' =>
+                        'Kailangan ng From at To date.'
                 ], 400);
             }
 
-            if (!isValidDate($from) || !isValidDate($to)) {
+            /*
+             * Validate date format.
+             */
+            if (
+                !isValidDate($from) ||
+                !isValidDate($to)
+            ) {
+
                 respond([
                     'success' => false,
-                    'message' => 'Invalid date format.'
+                    'message' =>
+                        'Invalid date format.'
                 ], 400);
             }
 
+            /*
+             * From date cannot be later than To date.
+             */
             if ($from > $to) {
+
                 respond([
                     'success' => false,
-                    'message' => 'Ang From date ay hindi pwedeng mas huli sa To date.'
+                    'message' =>
+                        'Ang From date ay hindi pwedeng mas huli sa To date.'
                 ], 400);
             }
 
-            if (!in_array($sort, ['oldest', 'latest'], true)) {
+            /*
+             * Allowed sorting values only.
+             */
+            if (
+                !in_array(
+                    $sort,
+                    [
+                        'oldest',
+                        'latest'
+                    ],
+                    true
+                )
+            ) {
+
                 $sort = 'latest';
             }
 
-            $filtered = $ticketModel->getResolvedTicketsByDateRange(
-                $from,
-                $to,
-                $sort
+            /*
+             * Pagination.
+             */
+            $page = max(
+                1,
+                (int) (
+                    $input['page'] ?? 1
+                )
+            );
+
+            $perPage = PRINT_PER_PAGE;
+
+            /*
+             * Existing Ticket method:
+             * Resolved tickets only, filtered by date range.
+             */
+            $filtered =
+                $ticketModel->getResolvedTicketsByDateRange(
+                    $from,
+                    $to,
+                    $sort
+                );
+
+            /*
+             * Total filtered tickets.
+             */
+            $total = count(
+                $filtered
+            );
+
+            /*
+             * Calculate total pages.
+             */
+            $totalPages = (int) max(
+                1,
+                ceil(
+                    $total / $perPage
+                )
+            );
+
+            /*
+             * Prevent invalid page number.
+             */
+            $page = min(
+                $page,
+                $totalPages
+            );
+
+            /*
+             * Calculate offset.
+             */
+            $offset =
+                ($page - 1) *
+                $perPage;
+
+            /*
+             * Get current page.
+             */
+            $pageItems = array_slice(
+                $filtered,
+                $offset,
+                $perPage
             );
 
             respond([
-                'success' => true,
-                'data' => $filtered,
-                'total' => count($filtered),
-                'sort' => $sort
+                'success'     => true,
+                'data'        => $pageItems,
+                'total'       => $total,
+                'page'        => $page,
+                'per_page'    => $perPage,
+                'total_pages' => $totalPages,
+                'sort'        => $sort
             ]);
         }
 
@@ -143,15 +357,20 @@ try {
         ====================================================== */
 
         default:
+
             respond([
                 'success' => false,
-                'message' => 'Unknown action.'
+                'message' =>
+                    'Unknown action.'
             ], 400);
     }
 
 } catch (Throwable $e) {
+
     respond([
         'success' => false,
-        'message' => 'Server error: ' . $e->getMessage()
+        'message' =>
+            'Server error: ' .
+            $e->getMessage()
     ], 500);
 }

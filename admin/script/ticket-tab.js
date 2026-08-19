@@ -12,6 +12,17 @@
    Lahat ng data (list, single ticket, submit response, atbp.)
    ay galing sa admin/control/ticket-tab-control.php — AJAX
    JSON endpoint. Walang full page reload kahit kailan.
+
+   REALTIME NOTIFICATIONS (tunog, SweetAlert popup, OS-level
+   Notification API) ay HINDI na dito nakatira — nailipat na sa
+   script/notification.js, na naka-<script> sa dulo ng
+   includes/dashboard.php. Doon lang dapat ang polling loop kasi
+   isang beses lang na-load ang dashboard.php bawat session
+   (hindi tulad ng ticket-tab.php na tab-injection, paulit-ulit
+   na-a-add/na-re-remove ng tab-manager.js). Ang script na ito
+   ay nakikinig na lang sa 'ticketing:newTickets' event (tingnan
+   sa ibaba, malapit sa INIT) para i-prepend sa listahan kung
+   bukas ang tab.
 =========================================================== */
 
 // -----------------------------------------------------------
@@ -19,8 +30,6 @@
 // -----------------------------------------------------------
 var TICKET_API_URL = '/ticketing/admin/control/ticket-tab-control.php';
 var TICKET_PER_PAGE = 10;
-var TICKET_POLL_INTERVAL_MS = 5000; // 5 segundo bawat "realtime" check
-var TICKET_NOTIF_SOUND_URL = '/ticketing/assets/sounds/notif.mp3';
 
 // Base URL para sa mga naka-attach na file. Ang attachment column
 // sa DB ay naka-store bilang relative path (hal. "attachment/xxx.png"),
@@ -29,24 +38,15 @@ var TICKET_NOTIF_SOUND_URL = '/ticketing/assets/sounds/notif.mp3';
 // sa browser sa pamamagitan ng "/ticketing/" + relative path.
 var TICKET_ATTACHMENT_BASE_URL = '/ticketing/';
 
-// -----------------------------------------------------------
-// NOTIFICATION PERMISSION — hingin ito NANG ISANG BESES sa
-// pagbukas ng Ticket Tab. Kailangan ito ng browser bago
-// pumayag magpakita ng OS-level notification (Notification API)
-// kapag naka-ibang tab/naka-minimize ang admin.
-// -----------------------------------------------------------
-if ('Notification' in window && Notification.permission === 'default') {
-  Notification.requestPermission();
-}
-
 function initTicketTab(container) {
   var root = container || document;
 
   var list = root.querySelector('#ticket-list');
   if (!list) return;
 
-  // Iwasan ang double-binding/double-polling kapag na-open/na-close
-  // /na-open ulit yung tab.
+  // Iwasan ang double-binding kapag na-open/na-close/na-open ulit
+  // yung tab (hindi na ito tungkol sa polling — display/CRUD event
+  // bindings na lang ang ini-iwasang madoble dito).
   if (list.dataset.ticketTabBound === 'true') return;
   list.dataset.ticketTabBound = 'true';
 
@@ -58,9 +58,6 @@ function initTicketTab(container) {
   // -----------------------------------------------------------
   var state = {
     currentPage: 1,
-    maxSeenId: 0,           // pinaka-mataas na ticket_id na nakita na
-    pollTimer: null,
-    isPolling: false,
     knownIds: {}            // ticket_id -> true, para hindi dumoble
   };
 
@@ -69,7 +66,6 @@ function initTicketTab(container) {
   var emptyEl      = root.querySelector('#ticket-list-empty');
   var countTextEl  = root.querySelector('#ticket-count-text');
   var liveDot      = root.querySelector('#ticket-live-dot');
-  var liveLabel    = root.querySelector('#ticket-live-label');
 
 
   /* =============================================================
@@ -548,7 +544,6 @@ function initTicketTab(container) {
         }
 
         state.currentPage = res.page;
-        state.maxSeenId = Math.max(state.maxSeenId, res.max_id || 0);
 
         renderTicketList(res.data);
         renderPagination(res.total_pages, res.page);
@@ -561,168 +556,53 @@ function initTicketTab(container) {
   }
 
 
-  /* =============================================================
-     NOTIFICATION SOUND + POPUP (SweetAlert2 kung active ang tab,
-     Notification API kung naka-ibang tab/naka-background)
-     -------------------------------------------------------------
-     Tinatawag ito kada bagong ticket na nakita ng polling loop,
-     kahit gaano katagal naka-YouTube/Google Search ang admin sa
-     ibang tab — basta't hindi pa sarado ang buong browser.
-  ============================================================== */
-  var ticketNotifSound = new Audio(TICKET_NOTIF_SOUND_URL);
-  ticketNotifSound.volume = 1.0;
-
-  function notifyNewTicket(ticket) {
-    // ---------- 1. TUNOG (palaging sinusubukang i-play) ----------
-    // Gagana ito basta't may naging user interaction na sa page
-    // (click/keypress) — autoplay policy lang ng browser ang
-    // makaka-block nito, hindi fatal error kung mabigo.
-    try {
-      ticketNotifSound.currentTime = 0;
-      ticketNotifSound.play().catch(function () {
-        // Naka-block dahil wala pang user interaction sa page.
-      });
-    } catch (e) {
-      // ignore
-    }
-
-    // ---------- 2. VISUAL NOTIFICATION ----------
-    if (document.hidden) {
-      // Tab ay naka-background/naka-ibang tab (hal. YouTube,
-      // Google search) — gamitin ang OS-level Notification API
-      // para lumabas ito kahit anong tab ang tinitingnan.
-      if ('Notification' in window && Notification.permission === 'granted') {
-        var n = new Notification('New Ticket Received', {
-          body: ticket.subject + ' — ' + ticket.username + ' (' + ticket.department + ')',
-          icon: '/ticketing/assets/logo/logo.png',
-          tag: 'ticket-' + ticket.ticket_id // iwas stacking ng paulit-ulit
-        });
-
-        n.onclick = function () {
-          window.focus();
-          n.close();
-        };
-      }
-      } else {
-      // Tab mismo ang naka-focus — SweetAlert2 modal sa gitna.
-      if (typeof Swal !== 'undefined') {
-        Swal.fire({
-          icon: 'info',
-          title: 'New Ticket Received',
-          html:
-            '<b>' + escapeHtml(ticket.subject) + '</b><br>' +
-            '<span class="text-sm text-gray-500">' +
-            escapeHtml(ticket.username) + ' — ' + escapeHtml(ticket.department) +
-            '</span>',
-          toast: false,
-          position: 'center',
-          showConfirmButton: true,
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#16a34a',
-          timer: 120000,
-          timerProgressBar: true,
-          allowOutsideClick: false,
-          allowEscapeKey: true
-        });
-      }
-    }
-  }
-
-
   /* =========================================================================
-     ============  AJAX REALTIME POLLING (PWESTO NG REALTIME LOGIC)  =========
+     ============  REALTIME UPDATES — LISTENER NA LANG, HINDI NA  ===========
+     ============  NAGPO-POLL DITO (tingnan script/notification.js)  ========
      =========================================================================
-     Dito nangyayari ang "realtime" na bahagi. Every TICKET_POLL_INTERVAL_MS
-     (5 seconds), tinatanong natin ang backend (action=poll&since_id=X) kung
-     may bagong ticket na dumating simula noong huling beses na nag-check
-     tayo. Kung may bago, ipe-prepend natin sa taas ng listahan gamit ang
-     prependNewTickets() — WALANG window.location.reload(), WALANG buong
-     re-fetch ng listahan, JSON lang na maliit ang laman.
+     Ang aktwal na polling (setInterval sa action=poll) ay nasa
+     script/notification.js na, na naka-<script> sa dulo ng
+     includes/dashboard.php — isang beses lang na-load bawat session,
+     kaya isang polling loop lang, forever, kahit ilang beses buksan/
+     isara ang Ticket Tab na ito.
 
-     Ito rin ang gagamitin mo kung gusto mo palitan ng WebSocket/SSE balang
-     araw — palitan mo lang itong function, ang buong app logic sa itaas
-     (renderTicketList, prependNewTickets, atbp.) ay hindi na kailangan
-     galawin.
+     Ang trabaho na lang dito: makinig sa 'ticketing:newTickets' na
+     dine-dispatch ng notification.js sa document kapag may bagong
+     ticket, tapos i-prepend sa listahan — PERO KUNG at KUNG lang
+     bukas ang Ticket Tab na ito ngayon AT nasa page 1 tayo (para
+     hindi nakakalito yung pagination kapag ibang page ang tinitingnan).
+
+     Ang tunog/popup/OS notification mismo ay ginagawa na rin ng
+     notification.js — hindi na responsibilidad ng file na ito.
   ========================================================================== */
-  function startRealtimePolling() {
-    if (state.pollTimer) return; // huwag na mag-double start
+  function handleNewTicketsEvent(e) {
+    // Self-cleaning: kung naalis na sa DOM ang container na ito
+    // (na-close na ang tab kanina), tanggalin na rin ang listener
+    // na ito para hindi na ito tumakbo nang walang saysay sa bawat
+    // susunod na bagong ticket.
+    if (!document.body.contains(list)) {
+      document.removeEventListener('ticketing:newTickets', handleNewTicketsEvent);
+      return;
+    }
 
-    state.pollTimer = setInterval(function () {
-      if (state.isPolling) return; // iwas overlapping requests
-      state.isPolling = true;
+    if (state.currentPage !== 1) return;
 
-      if (liveDot) liveDot.classList.add('animate-ping');
+    var tickets = (e.detail && e.detail.tickets) || [];
+    if (tickets.length === 0) return;
 
-      apiGet({ action: 'poll', since_id: state.maxSeenId })
-        .then(function (res) {
-          state.isPolling = false;
-          if (liveDot) liveDot.classList.remove('animate-ping');
+    prependNewTickets(tickets);
 
-          if (!res || !res.success) return;
-
-          if (res.max_id) {
-            state.maxSeenId = Math.max(state.maxSeenId, res.max_id);
-          }
-
-          // Ipakita lang agad ang mga bagong ticket kung nasa
-          // unang page tayo ngayon (para hindi nakakalito yung
-          // pagination kapag ibang page ang tinitingnan).
-          if (state.currentPage === 1 && res.data && res.data.length > 0) {
-            prependNewTickets(res.data);
-          }
-
-          // I-notify PARIN kahit anong page/tab state — kasi
-          // kailangan malaman ng admin agad kahit naka-page 2
-          // siya o naka-ibang tab (YouTube, Google, atbp.)
-          if (res.data && res.data.length > 0) {
-            res.data.forEach(function (ticket) {
-              notifyNewTicket(ticket);
-            });
-          }
-
-          if (liveLabel) liveLabel.textContent = 'Live';
-        })
-        .catch(function (err) {
-          state.isPolling = false;
-          if (liveDot) liveDot.classList.remove('animate-ping');
-          if (liveLabel) liveLabel.textContent = 'Reconnecting...';
-          console.error('Realtime poll failed:', err);
-        });
-    }, TICKET_POLL_INTERVAL_MS);
-  }
-
-  function stopRealtimePolling() {
-    if (state.pollTimer) {
-      clearInterval(state.pollTimer);
-      state.pollTimer = null;
+    // Maikling pulse sa "live" indicator, kung meron, bilang visual
+    // confirmation na may bagong dumating.
+    if (liveDot) {
+      liveDot.classList.add('animate-ping');
+      setTimeout(function () {
+        liveDot.classList.remove('animate-ping');
+      }, 1000);
     }
   }
 
-  /* -------------------------------------------------------------
-     BAGO: HINDI na natin itinitigil ang polling kapag naka-ibang
-     tab/naka-background (hal. naka-YouTube o Google Search ka).
-     Layunin nito ay makakuha pa rin ng abiso/tunog kahit hindi
-     naka-focus ang ticketing tab — importante ito dahil ikaw
-     mismo ang nag-hahandle ng mga tickets buong araw.
-
-     PAALALA: Ni-throttle ng mga modernong browser (lalo na
-     Chrome) ang JS timers sa background tabs matapos ang ~5
-     minuto ("intensive throttling") — posibleng maging mas
-     mabagal (hal. minuto-minuto na lang) sa halip na eksaktong
-     bawat 5 segundo habang naka-background. Hindi ito
-     titigilan, magpapatuloy lang siyang tumatakbo sa background
-     kahit gaano pa katagal.
-  ---------------------------------------------------------------- */
-  document.addEventListener('visibilitychange', function () {
-    // Sadyang walang ginagawa dito ngayon — sinasadya na hindi
-    // na itigil ang startRealtimePolling()/stopRealtimePolling()
-    // sa pagbabago ng visibility state. Nandito lang ang listener
-    // bilang reference kung sakaling gusto mo pang idagdag ulit
-    // ang naunang behavior sa hinaharap.
-  });
-  // ========================================================================
-  // ============  END OF AJAX REALTIME POLLING SECTION  ==================
-  // ========================================================================
+  document.addEventListener('ticketing:newTickets', handleNewTicketsEvent);
 
 
   /* =============================================================
@@ -978,8 +858,10 @@ function initTicketTab(container) {
 
 
   /* =============================================================
-     INIT — unang pag-load ng page 1, saka simulan ang polling
+     INIT — unang pag-load ng page 1. Ang polling mismo ay
+     independiyenteng tumatakbo na sa script/notification.js;
+     ang ginagawa lang dito ay makinig sa event nito (tingnan
+     ang handleNewTicketsEvent sa itaas).
   ============================================================== */
   loadPage(1);
-  startRealtimePolling();
 }

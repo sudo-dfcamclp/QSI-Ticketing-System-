@@ -204,6 +204,15 @@
 
             </div>
 
+            <!-- =========================================================
+                 PAGINATION (dynamic — pinopopulate ito ng print.js base
+                 sa total_pages na ibinabalik ng print-control.php,
+                 max 10 rows per page)
+            ========================================================== -->
+            <div class="flex items-center justify-center gap-2 mt-7" id="print-ticket-pagination">
+                <!-- JS-rendered page buttons -->
+            </div>
+
         </div>
 
     </div>

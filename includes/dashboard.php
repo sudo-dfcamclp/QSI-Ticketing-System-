@@ -123,7 +123,7 @@ require_once __DIR__ . '/auth/auth.php';
                                     <div class="flex-1 bg-white rounded-2xl shadow-sm hover:shadow-md transition p-5 border border-gray-100">
                                         <div class="flex items-center justify-between h-full">
                                             <div>
-                                                <p class="text-sm text-gray-500">Total Active</p>
+                                                <p class="text-sm text-gray-500">Total Active Tickets</p>
                                                 <h2 id="totalActive" class="text-3xl font-bold text-gray-800 mt-2">0</h2>
                                             </div>
 
@@ -334,6 +334,6 @@ require_once __DIR__ . '/auth/auth.php';
     <script src="/ticketing/script/tab-manager.js"></script>
     <script src="/ticketing/script/dashboard.js"></script>
     <script src="/ticketing/script/dashboard-analytics.js"></script>
-
+    <script src="/ticketing/script/notification.js"></script>
 </body>
 </html>

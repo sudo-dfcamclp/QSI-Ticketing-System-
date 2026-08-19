@@ -1,6 +1,7 @@
 var PRINT_API_URL = '/ticketing/admin/control/print-control.php';
 var PRINT_PDF_URL = '/ticketing/admin/pdf.php';
 var PRINT_REFRESH_INTERVAL_MS = 5000;
+var PRINT_PER_PAGE = 10;
 
 function initPrintTab(container) {
     var root = container || document;
@@ -18,8 +19,16 @@ function initPrintTab(container) {
     var dateToEl = root.querySelector('#print-date-to');
     var sortEl = root.querySelector('#print-sort');
     var printBtn = root.querySelector('#print-ticket-btn');
+    var paginationEl = root.querySelector('#print-ticket-pagination');
 
     var refreshTimer = null;
+
+    // Naka-scope dito ang kasalukuyang pinapakitang page, para
+    // hindi na-re-reset pabalik sa page 1 kapag nag-realtime
+    // refresh (bawat PRINT_REFRESH_INTERVAL_MS).
+    var state = {
+        currentPage: 1
+    };
 
     /* =========================================================
        STATUS BADGE
@@ -114,15 +123,48 @@ function initPrintTab(container) {
     }
 
     /* =========================================================
-       FETCH ALL TICKETS
+       RENDER PAGINATION
+       -------------------------------------------------------------
+       Parehong pattern ng ticket-tab.js — isang button per page
+       (max 10 rows per page, PRINT_PER_PAGE), naka-highlight ang
+       kasalukuyang page.
     ========================================================== */
 
-    function fetchTicketList(showLoading) {
+    function renderPagination(totalPages, currentPage) {
+        if (!paginationEl) return;
+
+        paginationEl.innerHTML = '';
+
+        if (!totalPages || totalPages <= 1) return;
+
+        for (var p = 1; p <= totalPages; p++) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.dataset.page = String(p);
+            btn.textContent = String(p);
+
+            var isActive = p === currentPage;
+            btn.className = isActive
+                ? 'page-btn w-9 h-9 rounded-lg bg-pine text-white text-sm font-semibold shadow-sm hover:bg-pinedark transition-colors'
+                : 'page-btn w-9 h-9 rounded-lg bg-surface border border-hairline text-inkmuted text-sm font-medium hover:bg-canvas hover:border-[#C6D1C4] transition-colors';
+            btn.setAttribute('aria-current', isActive ? 'true' : 'false');
+
+            paginationEl.appendChild(btn);
+        }
+    }
+
+    /* =========================================================
+       FETCH TICKETS (may pagination na, max 10 per page)
+    ========================================================== */
+
+    function fetchTicketList(showLoading, page) {
+        var targetPage = page || state.currentPage || 1;
+
         if (showLoading && loadingEl) {
             loadingEl.classList.remove('hidden');
         }
 
-        fetch(PRINT_API_URL + '?action=list', {
+        fetch(PRINT_API_URL + '?action=list&page=' + encodeURIComponent(targetPage) + '&per_page=' + PRINT_PER_PAGE, {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -133,7 +175,9 @@ function initPrintTab(container) {
         })
         .then(function(json) {
             if (json && json.success) {
+                state.currentPage = json.page || targetPage;
                 renderRows(json.data);
+                renderPagination(json.total_pages, state.currentPage);
             }
         })
         .catch(function(err) {
@@ -147,14 +191,32 @@ function initPrintTab(container) {
     }
 
     /* =========================================================
+       PAGINATION CLICK EVENT
+    ========================================================== */
+
+    function bindPaginationEvents() {
+        if (!paginationEl) return;
+
+        paginationEl.addEventListener('click', function(e) {
+            var btn = e.target.closest('.page-btn');
+            if (!btn) return;
+
+            var page = parseInt(btn.getAttribute('data-page'), 10);
+            if (!page || page === state.currentPage) return;
+
+            fetchTicketList(true, page);
+        });
+    }
+
+    /* =========================================================
        REALTIME REFRESH
     ========================================================== */
 
     function startRealtimeRefresh() {
-        fetchTicketList(true);
+        fetchTicketList(true, state.currentPage);
 
         refreshTimer = setInterval(function() {
-            fetchTicketList(false);
+            fetchTicketList(false, state.currentPage);
         }, PRINT_REFRESH_INTERVAL_MS);
     }
 
@@ -285,6 +347,7 @@ function initPrintTab(container) {
 
     bindDateFilterEvents();
     bindPrintButtonEvents();
+    bindPaginationEvents();
     updatePrintButtonState();
     startRealtimeRefresh();
 }

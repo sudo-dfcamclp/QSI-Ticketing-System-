@@ -1,0 +1,19 @@
+                
+                /*JAVASCRIPT*/
+                var addUserBtn      = root.querySelector('#add-user-btn');
+                
+                
+                
+                
+                /*PHP INSIDE HTML*/
+                <?php if ($isSuperAdmin): ?>
+                <!-- ADD USER BUTTON (super_admin lang) -->
+                <button
+                    type="button"
+                    id="add-user-btn"
+                    class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-pine hover:bg-pinedark text-white text-sm font-semibold shadow-sm transition-colors"
+                >
+                    <i class="fa-solid fa-user-plus text-xs"></i>
+                    Add User
+                </button>
+                <?php endif; ?>

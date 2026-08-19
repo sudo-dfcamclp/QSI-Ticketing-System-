@@ -17,30 +17,37 @@ class Users
     |--------------------------------------------------------------------------
     | CREATE
     |--------------------------------------------------------------------------
-    | Create a new user.
+    | Create a new user. Defaults to user_type "admin" and status
+    | "pending" (self-registration, e.g. register.php) — pag super_admin
+    | ang gumawa ng account (Add User sa Manage Users), "active" agad
+    | ang ipinapasa dito mula sa control file.
     */
     public function create(
         string $f_name,
         string $l_name,
         string $username,
         string $gmail,
-        string $password
+        string $password,
+        string $user_type = 'admin',
+        string $status = 'pending'
     ): bool {
         $sql = "INSERT INTO {$this->table}
-                (f_name, l_name, username, gmail, password)
+                (f_name, l_name, username, gmail, password, user_type, status)
                 VALUES
-                (:f_name, :l_name, :username, :gmail, :password)";
+                (:f_name, :l_name, :username, :gmail, :password, :user_type, :status)";
 
         $stmt = $this->db->prepare($sql);
 
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         return $stmt->execute([
-            ':f_name'   => $f_name,
-            ':l_name'   => $l_name,
-            ':username' => $username,
-            ':gmail'    => $gmail,
-            ':password' => $passwordHash
+            ':f_name'    => $f_name,
+            ':l_name'    => $l_name,
+            ':username'  => $username,
+            ':gmail'     => $gmail,
+            ':password'  => $passwordHash,
+            ':user_type' => $user_type,
+            ':status'    => $status
         ]);
     }
 
@@ -57,6 +64,8 @@ class Users
                     l_name,
                     username,
                     gmail,
+                    user_type,
+                    status,
                     created_at
                 FROM {$this->table}
                 ORDER BY user_id DESC";
@@ -79,6 +88,8 @@ class Users
                     l_name,
                     username,
                     gmail,
+                    user_type,
+                    status,
                     created_at
                 FROM {$this->table}
                 WHERE user_id = :user_id
@@ -108,6 +119,8 @@ class Users
                     username,
                     gmail,
                     password,
+                    user_type,
+                    status,
                     created_at
                 FROM {$this->table}
                 WHERE username = :username
@@ -183,6 +196,33 @@ class Users
         $stmt = $this->db->prepare($sql);
 
         return $stmt->execute($params);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | UPDATE STATUS
+    |--------------------------------------------------------------------------
+    | Ginagamit ng Enable/Disable na dropdown action sa Manage Users.
+    | Allowed values lang: pending, active, disable.
+    */
+    public function updateStatus(int $user_id, string $status): bool
+    {
+        $allowed = ['pending', 'active', 'disable'];
+
+        if (!in_array($status, $allowed, true)) {
+            return false;
+        }
+
+        $sql = "UPDATE {$this->table}
+                SET status = :status
+                WHERE user_id = :user_id";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([
+            ':status'  => $status,
+            ':user_id' => $user_id
+        ]);
     }
 
     /*
